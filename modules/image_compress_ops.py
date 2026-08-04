@@ -1,6 +1,7 @@
 import os
 from urllib.parse import urlparse, unquote
 from gi.repository import Gtk, Gdk
+from translation import Translation
 
 try:
     from PIL import Image
@@ -40,7 +41,6 @@ def is_image_file(file):
 
 def _connect_spin_keys(spin, win, ok_btn):
     """Connect Enter/Escape on a SpinButton's internal Text widget."""
-    # GTK4 SpinButton contains a Text child that receives key events
     text_widget = spin.get_first_child()
     if text_widget is None:
         text_widget = spin
@@ -58,7 +58,7 @@ class ImageCompressOps:
         if not HAS_PIL:
             return
 
-        win = Gtk.Window(title="按质量压缩")
+        win = Gtk.Window(title=Translation.t("dialog_quality_title"))
         win.set_default_size(350, 150)
         win.set_modal(True)
 
@@ -68,7 +68,7 @@ class ImageCompressOps:
         box.set_margin_start(20)
         box.set_margin_end(20)
 
-        label = Gtk.Label(label="质量百分比 (1-100)：")
+        label = Gtk.Label(label=Translation.t("dialog_quality_label"))
         box.append(label)
 
         adj = Gtk.Adjustment(value=80, lower=1, upper=100, step_increment=1, page_increment=10)
@@ -79,11 +79,11 @@ class ImageCompressOps:
         btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         btn_box.set_halign(Gtk.Align.END)
 
-        cancel_btn = Gtk.Button(label="取消")
+        cancel_btn = Gtk.Button(label=Translation.t("dialog_cancel"))
         cancel_btn.connect("clicked", lambda b: win.destroy())
         btn_box.append(cancel_btn)
 
-        ok_btn = Gtk.Button(label="压缩")
+        ok_btn = Gtk.Button(label=Translation.t("dialog_compress"))
         ok_btn.add_css_class("suggested-action")
         ok_btn.connect("clicked", lambda b: self._do_quality_compress(win, spin.get_value_as_int(), files))
         btn_box.append(ok_btn)
@@ -130,7 +130,7 @@ class ImageCompressOps:
             except Exception:
                 pass
 
-        win = Gtk.Window(title="按尺寸缩放")
+        win = Gtk.Window(title=Translation.t("dialog_dimensions_title"))
         win.set_default_size(350, 200)
         win.set_modal(True)
 
@@ -140,12 +140,12 @@ class ImageCompressOps:
         box.set_margin_start(20)
         box.set_margin_end(20)
 
-        label_w = Gtk.Label(label=f"宽度 (像素) — 原始 {default_w}：")
+        label_w = Gtk.Label(label=Translation.t("dialog_width_label").format(w=default_w))
         adj_w = Gtk.Adjustment(value=default_w, lower=1, upper=65535, step_increment=1, page_increment=100)
         spin_w = Gtk.SpinButton()
         spin_w.set_adjustment(adj_w)
 
-        label_h = Gtk.Label(label=f"高度 (像素) — 原始 {default_h}：")
+        label_h = Gtk.Label(label=Translation.t("dialog_height_label").format(h=default_h))
         adj_h = Gtk.Adjustment(value=default_h, lower=1, upper=65535, step_increment=1, page_increment=100)
         spin_h = Gtk.SpinButton()
         spin_h.set_adjustment(adj_h)
@@ -158,11 +158,11 @@ class ImageCompressOps:
         btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         btn_box.set_halign(Gtk.Align.END)
 
-        cancel_btn = Gtk.Button(label="取消")
+        cancel_btn = Gtk.Button(label=Translation.t("dialog_cancel"))
         cancel_btn.connect("clicked", lambda b: win.destroy())
         btn_box.append(cancel_btn)
 
-        ok_btn = Gtk.Button(label="缩放")
+        ok_btn = Gtk.Button(label=Translation.t("dialog_resize"))
         ok_btn.add_css_class("suggested-action")
         ok_btn.connect("clicked", lambda b: self._do_resize_dimensions(
             win, spin_w.get_value_as_int(), spin_h.get_value_as_int(), files))
@@ -170,7 +170,6 @@ class ImageCompressOps:
 
         box.append(btn_box)
         win.set_child(box)
-        # Connect keys on both spin buttons
         _connect_spin_keys(spin_w, win, ok_btn)
         _connect_spin_keys(spin_h, win, ok_btn)
         win.present()
@@ -198,7 +197,7 @@ class ImageCompressOps:
         if not HAS_PIL:
             return
 
-        win = Gtk.Window(title="按百分比缩放")
+        win = Gtk.Window(title=Translation.t("dialog_percent_title"))
         win.set_default_size(350, 150)
         win.set_modal(True)
 
@@ -208,7 +207,7 @@ class ImageCompressOps:
         box.set_margin_start(20)
         box.set_margin_end(20)
 
-        label = Gtk.Label(label="缩放百分比 (1-100)：")
+        label = Gtk.Label(label=Translation.t("dialog_percent_label"))
         adj = Gtk.Adjustment(value=50, lower=1, upper=100, step_increment=1, page_increment=10)
         spin = Gtk.SpinButton()
         spin.set_adjustment(adj)
@@ -218,11 +217,11 @@ class ImageCompressOps:
         btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         btn_box.set_halign(Gtk.Align.END)
 
-        cancel_btn = Gtk.Button(label="取消")
+        cancel_btn = Gtk.Button(label=Translation.t("dialog_cancel"))
         cancel_btn.connect("clicked", lambda b: win.destroy())
         btn_box.append(cancel_btn)
 
-        ok_btn = Gtk.Button(label="缩放")
+        ok_btn = Gtk.Button(label=Translation.t("dialog_resize"))
         ok_btn.add_css_class("suggested-action")
         ok_btn.connect("clicked", lambda b: self._do_resize_percent(win, spin.get_value(), files))
         btn_box.append(ok_btn)

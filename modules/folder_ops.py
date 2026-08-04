@@ -2,6 +2,7 @@ import os
 import shutil
 from urllib.parse import urlparse, unquote
 from gi.repository import Gtk, Gdk
+from translation import Translation
 
 
 def _uri_to_path(file):
@@ -46,7 +47,7 @@ class FolderOps:
 
         parent_path = os.path.dirname(_uri_to_path(files[0]))
 
-        win = Gtk.Window(title="收进文件夹")
+        win = Gtk.Window(title=Translation.t("dialog_move_into_folder_title"))
         win.set_default_size(350, 120)
         win.set_modal(True)
 
@@ -56,21 +57,21 @@ class FolderOps:
         box.set_margin_start(20)
         box.set_margin_end(20)
 
-        label = Gtk.Label(label="请输入文件夹名称：")
+        label = Gtk.Label(label=Translation.t("dialog_folder_name_label"))
         box.append(label)
 
         entry = Gtk.Entry()
-        entry.set_text("新文件夹")
+        entry.set_text(Translation.t("dialog_default_folder_name"))
         box.append(entry)
 
         btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         btn_box.set_halign(Gtk.Align.END)
 
-        cancel_btn = Gtk.Button(label="取消")
+        cancel_btn = Gtk.Button(label=Translation.t("dialog_cancel"))
         cancel_btn.connect("clicked", lambda b: win.destroy())
         btn_box.append(cancel_btn)
 
-        ok_btn = Gtk.Button(label="创建")
+        ok_btn = Gtk.Button(label=Translation.t("dialog_create"))
         ok_btn.add_css_class("suggested-action")
         ok_btn.connect("clicked", lambda b: self._do_move_into_folder(win, entry.get_text(), files))
         btn_box.append(ok_btn)

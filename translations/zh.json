@@ -18,5 +18,25 @@
   "resize_by_dimensions": "按尺寸缩放...",
   "resize_by_percent": "按百分比缩放...",
   "checksum_submenu": "校验和",
-  "checksum": "校验和 ({algo})"
+  "checksum": "校验和 ({algo})",
+
+  "dialog_cancel": "取消",
+  "dialog_ok": "确定",
+
+  "dialog_move_into_folder_title": "收进文件夹",
+  "dialog_folder_name_label": "请输入文件夹名称：",
+  "dialog_default_folder_name": "新文件夹",
+  "dialog_create": "创建",
+
+  "dialog_quality_title": "按质量压缩",
+  "dialog_quality_label": "质量百分比 (1-100)：",
+  "dialog_compress": "压缩",
+
+  "dialog_dimensions_title": "按尺寸缩放",
+  "dialog_width_label": "宽度 (像素) — 原始 {w}：",
+  "dialog_height_label": "高度 (像素) — 原始 {h}：",
+  "dialog_resize": "缩放",
+
+  "dialog_percent_title": "按百分比缩放",
+  "dialog_percent_label": "缩放百分比 (1-100)："
 }

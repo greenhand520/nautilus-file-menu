@@ -18,5 +18,25 @@
   "resize_by_dimensions": "By Dimensions...",
   "resize_by_percent": "By Percent...",
   "checksum_submenu": "Checksum",
-  "checksum": "Checksum ({algo})"
+  "checksum": "Checksum ({algo})",
+
+  "dialog_cancel": "Cancel",
+  "dialog_ok": "OK",
+
+  "dialog_move_into_folder_title": "Move into Folder",
+  "dialog_folder_name_label": "Enter folder name:",
+  "dialog_default_folder_name": "New Folder",
+  "dialog_create": "Create",
+
+  "dialog_quality_title": "Compress by Quality",
+  "dialog_quality_label": "Quality percentage (1-100):",
+  "dialog_compress": "Compress",
+
+  "dialog_dimensions_title": "Resize by Dimensions",
+  "dialog_width_label": "Width (pixels) — original {w}:",
+  "dialog_height_label": "Height (pixels) — original {h}:",
+  "dialog_resize": "Resize",
+
+  "dialog_percent_title": "Resize by Percent",
+  "dialog_percent_label": "Scale percentage (1-100):"
 }
