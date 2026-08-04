@@ -1,0 +1,54 @@
+{
+  "items": {
+    "path": true,
+    "uri": false,
+    "name": true,
+    "content": false,
+    "dissolve_folder": true,
+    "move_into_folder": true,
+    "open_ide": true,
+    "image_convert": true,
+    "image_compress": true,
+    "checksum": true
+  },
+  "selections": {
+    "clipboard": true,
+    "primary": true
+  },
+  "shortcuts": {
+    "path": "<Ctrl><Shift>C",
+    "uri": "<Ctrl><Shift>U",
+    "name": "<Ctrl><Shift>D",
+    "content": "<Ctrl><Shift>G"
+  },
+  "language": "auto",
+  "separator": ", ",
+  "escape_value_items": false,
+  "escape_value": false,
+  "name_ignore_extension": false,
+  "ide_commands": {
+    "vscode": "code",
+    "code-insiders": "code-insiders",
+    "code-oss": "code-oss",
+    "zed": "zed"
+  },
+  "flatpak_ids": {
+    "vscode": "com.visualstudio.code",
+    "code-insiders": "com.visualstudio.code.insiders",
+    "code-oss": "com.visualstudio.code-oss",
+    "zed": "dev.zed.Zed"
+  },
+  "jetbrains_commands": {
+    "IntelliJ IDEA": "idea",
+    "PyCharm": "pycharm",
+    "WebStorm": "webstorm",
+    "CLion": "clion",
+    "GoLand": "goland",
+    "Rider": "rider",
+    "RubyMine": "rubymine",
+    "PhpStorm": "phpstorm",
+    "DataGrip": "datagrip"
+  },
+  "image_formats": ["PNG", "JPEG", "WEBP", "BMP", "TIFF"],
+  "checksum_algorithms": ["md5", "sha1", "sha256", "sha512"]
+}

@@ -1,0 +1,22 @@
+{
+  "copy_path": "复制路径",
+  "copy_paths": "复制各个路径",
+  "copy_name": "复制文件名",
+  "copy_names": "复制各个文件名",
+  "copy_uri": "复制URI",
+  "copy_uris": "复制各个URI",
+  "copy_content": "复制文本内容",
+  "dissolve_folder": "解散文件夹",
+  "move_into_folder": "收进文件夹",
+  "open_with_ide": "用 {ide} 打开",
+  "open_with_ide_submenu": "用 IDE 打开",
+  "open_with_jetbrains": "JetBrains",
+  "image_convert_submenu": "图像转换为",
+  "convert_to": "转换为 {format}",
+  "image_compress_submenu": "图像压缩",
+  "compress_by_quality": "按质量压缩...",
+  "resize_by_dimensions": "按尺寸缩放...",
+  "resize_by_percent": "按百分比缩放...",
+  "checksum_submenu": "校验和",
+  "checksum": "校验和 ({algo})"
+}

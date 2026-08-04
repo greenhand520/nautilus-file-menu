@@ -1,0 +1,22 @@
+{
+  "copy_path": "Copy Path",
+  "copy_paths": "Copy Paths",
+  "copy_name": "Copy Name",
+  "copy_names": "Copy Names",
+  "copy_uri": "Copy URI",
+  "copy_uris": "Copy URIs",
+  "copy_content": "Copy Content",
+  "dissolve_folder": "Dissolve Folder",
+  "move_into_folder": "Move into Folder",
+  "open_with_ide": "Open with {ide}",
+  "open_with_ide_submenu": "Open with IDE",
+  "open_with_jetbrains": "JetBrains",
+  "image_convert_submenu": "Convert Image to",
+  "convert_to": "Convert to {format}",
+  "image_compress_submenu": "Compress Image",
+  "compress_by_quality": "By Quality...",
+  "resize_by_dimensions": "By Dimensions...",
+  "resize_by_percent": "By Percent...",
+  "checksum_submenu": "Checksum",
+  "checksum": "Checksum ({algo})"
+}
