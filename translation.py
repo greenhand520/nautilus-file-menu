@@ -6,17 +6,18 @@ import os
 
 class Translation:
     _translations_path = os.path.join(os.path.dirname(__file__), 'translations')
-    _translations = []
-    _default_translations = []
+    _translations: dict[str, str] = {}
+    _default_translations: dict[str, str] = {}
+    lang_code = "auto"
 
     @staticmethod
     def select_language(lang_code="auto"):
         if not lang_code or lang_code == "auto":
-            default_locale = locale.getdefaultlocale()[0]
             try:
+                default_locale = locale.getlocale()[0] or os.environ.get("LANG", "en")
                 lang = default_locale.split("_")
                 lang_code = lang[0] if len(lang) else "en"
-            except AttributeError:
+            except (AttributeError, ValueError):
                 lang_code = "en"
 
         if lang_code in Translation.available_languages():
@@ -43,7 +44,7 @@ class Translation:
         return [os.path.splitext(os.path.basename(x))[0] for x in glob.glob(Translation._translations_path + '/*.json')]
 
     @staticmethod
-    def t(translation):
+    def t(translation) -> str:
         if not Translation._translations:
             Translation.select_language()
         if translation in Translation._translations:
