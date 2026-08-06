@@ -41,5 +41,7 @@
   "dialog_percent_label": "缩放百分比 (1-100)：",
 
   "notify_file_checksum_ok": "{}已复制到剪贴板",
-  "notify_files_checksum_ok": "{}个文件的{}已复制到剪贴板"
+  "notify_files_checksum_ok": "{}个文件的{}已复制到剪贴板",
+
+  "notify_file_contents_copied": "文件 {} 内容已复制到剪贴板"
 }

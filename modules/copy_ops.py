@@ -1,6 +1,8 @@
 import os
 import shlex
 from urllib.parse import urlparse, unquote
+from .notify import notify
+from translation import Translation
 
 
 class CopyOps:
@@ -28,21 +30,18 @@ class CopyOps:
 
         self._copy_value(list(map(_name, files)))
 
-    def copy_content(self, menu, files):
-        allow_copy_content = [
-            "application/x-shellscript",
-            "application/json",
-        ]
+    def copy_content(self, menu, file):
+        allow_copy_content = ["application/x-shellscript", "application/json", ]
         content = []
-        for file in files:
-            file_type = file.get_mime_type()
-            if file_type in allow_copy_content or file_type.startswith("text/"):
-                p = urlparse(file.get_activation_uri())
-                p = os.path.abspath(os.path.join(p.netloc, unquote(p.path)))
-                with open(p, 'r') as _file:
-                    content.append(_file.read())
+        file_type = file.get_mime_type()
+        if file_type in allow_copy_content or file_type.startswith("text/"):
+            p = urlparse(file.get_activation_uri())
+            p = os.path.abspath(os.path.join(p.netloc, unquote(p.path)))
+            with open(p, 'r') as _file:
+                content.append(_file.read())
 
         self._copy_value(content)
+        notify(Translation.t("notify_file_contents_copied").format(file.get_name()))
 
     def _copy_value(self, value):
         if len(value) > 0:

@@ -41,5 +41,7 @@
   "dialog_percent_label": "Scale percentage (1-100):",
 
   "notify_file_checksum_ok": "{} copied to clipboard",
-  "notify_files_checksum_ok": "{} of {} files copied to clipboard"
+  "notify_files_checksum_ok": "{} of {} files copied to clipboard",
+
+  "notify_file_contents_copied": "Contents of file {} copied to clipboard"
 }
