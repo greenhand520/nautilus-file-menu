@@ -1,13 +1,30 @@
 import os
-import shutil
-from urllib.parse import urlparse, unquote
-from gi.repository import Gtk, Gdk
+from gi import require_version
+require_version('Gtk', '4.0')
+from gi.repository import Gtk, Gdk, Gio, GLib
 from translation import Translation
+from .path_utils import uri_to_path as _uri_to_path
+from .notify import logger
 
 
-def _uri_to_path(file):
-    p = urlparse(file.get_activation_uri())
-    return os.path.abspath(os.path.join(p.netloc, unquote(p.path)))
+def _unique_dst(parent, item_name):
+    """Return a unique destination path in parent, appending _N if needed."""
+    dst = os.path.join(parent, item_name)
+    if not os.path.exists(dst):
+        return dst
+    base, ext = os.path.splitext(item_name)
+    counter = 1
+    while os.path.exists(dst):
+        dst = os.path.join(parent, f"{base}_{counter}{ext}")
+        counter += 1
+    return dst
+
+
+def _gio_move(src_path, dst_path):
+    """Move a file using Gio.File.move."""
+    src = Gio.File.new_for_path(src_path)
+    dst = Gio.File.new_for_path(dst_path)
+    src.move(dst, Gio.FileCopyFlags.NONE, None, None, None)
 
 
 class FolderOps:
@@ -24,28 +41,18 @@ class FolderOps:
 
         for item_name in os.listdir(folder_path):
             src = os.path.join(folder_path, item_name)
-            dst = os.path.join(parent_path, item_name)
-
-            if os.path.exists(dst):
-                base, ext = os.path.splitext(item_name)
-                counter = 1
-                while os.path.exists(dst):
-                    dst = os.path.join(parent_path, f"{base}_{counter}{ext}")
-                    counter += 1
-
-            shutil.move(src, dst)
+            dst = _unique_dst(parent_path, item_name)
+            _gio_move(src, dst)
 
         try:
-            os.rmdir(folder_path)
-        except OSError:
-            pass
+            Gio.File.new_for_path(folder_path).delete(None)
+        except GLib.Error as e:
+            logger.error("dissolve_folder: failed to remove folder: %s", e.message)
 
     def move_into_folder(self, menu, files):
         """Create a new folder and move all selected files into it."""
         if len(files) < 2:
             return
-
-        parent_path = os.path.dirname(_uri_to_path(files[0]))
 
         win = Gtk.Window(title=Translation.t("dialog_move_into_folder_title"))
         win.set_default_size(350, 120)
@@ -83,9 +90,14 @@ class FolderOps:
         entry.connect("activate", lambda e: self._do_move_into_folder(win, entry.get_text(), files))
 
         # Escape on Entry → cancel
+        def _on_key(ctrl, keyval, keycode, state):
+            if keyval == Gdk.KEY_Escape:
+                win.destroy()
+                return True
+            return False
+
         controller = Gtk.EventControllerKey()
-        controller.connect("key-pressed", lambda ctrl, keyval, keycode, state:
-            win.destroy() if keyval == Gdk.KEY_Escape else False)
+        controller.connect("key-pressed", _on_key)
         entry.add_controller(controller)
 
         win.present()
@@ -97,19 +109,13 @@ class FolderOps:
 
         win.destroy()
 
-        parent_path = os.path.dirname(_uri_to_path(files[0]))
-        new_folder = os.path.join(parent_path, folder_name)
-        os.makedirs(new_folder, exist_ok=True)
+        paths = [_uri_to_path(f) for f in files]
+        parent_path = os.path.dirname(paths[0])
+        new_folder = os.path.join(str(parent_path), folder_name)
 
-        for f in files:
-            src = _uri_to_path(f)
-            dst = os.path.join(new_folder, os.path.basename(src))
+        # Create folder using Gio
+        Gio.File.new_for_path(new_folder).make_directory_with_parents(None)
 
-            if os.path.exists(dst):
-                base, ext = os.path.splitext(os.path.basename(src))
-                counter = 1
-                while os.path.exists(dst):
-                    dst = os.path.join(new_folder, f"{base}_{counter}{ext}")
-                    counter += 1
-
-            shutil.move(src, dst)
+        for src in paths:
+            dst = _unique_dst(new_folder, os.path.basename(src))
+            _gio_move(src, dst)
