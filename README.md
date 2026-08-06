@@ -153,6 +153,7 @@ Edit `config.json` (installed at `~/.local/share/nautilus-python/extensions/naut
 
 - [nautilus-copy-path](https://github.com/chr314/nautilus-copy-path)
 - [nautilus-open-in-code](https://github.com/GustavoWidman/nautilus-open-in-ptyxis/blob/open-in-code/nautilus-open-in-code.py)
+- [python-nautilus](https://github.com/GNOME/python-nautilus)
 
 ## License
 

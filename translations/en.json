@@ -43,5 +43,17 @@
   "notify_file_checksum_ok": "{} copied to clipboard",
   "notify_files_checksum_ok": "{} of {} files copied to clipboard",
 
-  "notify_file_contents_copied": "Contents of file {} copied to clipboard"
+  "notify_file_contents_copied": "Contents of file {} copied to clipboard",
+
+  "notify_image_convert_tool_not_installed": "ImageMagick or PIL not installed",
+  "notify_image_converted": "Image conversion completed",
+  "notify_no_image_converted": "No files converted",
+  "notify_image_converted_count": "{}/{} files converted",
+
+  "notify_compress_done": "Quality compression completed",
+  "notify_no_image_compressed": "No files compressed (output may be larger)",
+  "notify_compress_count": "{}/{} files compressed",
+
+  "notify_resize_done": "Resize completed",
+  "notify_resize_count": "{}/{} files processed"
 }

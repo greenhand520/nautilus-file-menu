@@ -1,7 +1,15 @@
 import os
-from urllib.parse import urlparse, unquote
-from gi.repository import Gtk, Gdk
+import threading
+from gi import require_version
+require_version('Gtk', '4.0')
+from gi.repository import Gtk, Gdk, GLib
 from translation import Translation
+from .path_utils import uri_to_path as _uri_to_path
+from .pngquant_utils import has_pngquant, compress_batch as pngquant_batch
+from .imagemagick_utils import (
+    has_mogrify, compress_batch_by_quality as im_compress_batch,
+)
+from .notify import logger, notify
 
 try:
     from PIL import Image
@@ -9,34 +17,7 @@ try:
 except ImportError:
     HAS_PIL = False
 
-
-def _uri_to_path(file):
-    p = urlparse(file.get_activation_uri())
-    return os.path.abspath(os.path.join(p.netloc, unquote(p.path)))
-
-
-IMAGE_MIME_PREFIXES = [
-    "image/png",
-    "image/jpeg",
-    "image/webp",
-    "image/bmp",
-    "image/tiff",
-    "image/x-ms-bmp",
-]
-
-FORMAT_MAP = {
-    ".png": "PNG",
-    ".jpg": "JPEG",
-    ".jpeg": "JPEG",
-    ".webp": "WEBP",
-    ".bmp": "BMP",
-    ".tiff": "TIFF",
-}
-
-
-def is_image_file(file):
-    mime = file.get_mime_type()
-    return any(mime.startswith(prefix) for prefix in IMAGE_MIME_PREFIXES)
+PNG_EXTS = {".png"}
 
 
 def _connect_spin_keys(spin, win, ok_btn):
@@ -45,17 +26,49 @@ def _connect_spin_keys(spin, win, ok_btn):
     if text_widget is None:
         text_widget = spin
 
+    def _on_key(ctrl, keyval, keycode, state):
+        if keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
+            ok_btn.activate()
+            return True
+        if keyval == Gdk.KEY_Escape:
+            win.destroy()
+            return True
+        return False
+
     controller = Gtk.EventControllerKey()
-    controller.connect("key-pressed", lambda ctrl, keyval, keycode, state:
-        ok_btn.activate() if keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter)
-        else win.destroy() if keyval == Gdk.KEY_Escape
-        else False)
+    controller.connect("key-pressed", _on_key)
     text_widget.add_controller(controller)
+
+
+def _output_path(src_path, suffix):
+    base, ext = os.path.splitext(src_path)
+    return f"{base}{suffix}{ext}"
+
+
+def _unprocessed_paths(paths, outputs, suffix):
+    successful = {os.path.abspath(path) for path in outputs}
+    return [
+        path for path in paths
+        if os.path.abspath(_output_path(path, suffix)) not in successful
+    ]
+
+
+def _pil_compress_one(src_path, quality):
+    """Compress a single image with PIL. Returns output path or None."""
+    from .image_quality_compress import compress_image
+
+    dst_path = _output_path(src_path, f"_q{int(quality)}")
+    try:
+        ok, _ = compress_image(src_path, dst_path, quality)
+        return dst_path if ok else None
+    except Exception:
+        logger.exception("PIL compress failed: %s", src_path)
+        return None
 
 
 class ImageCompressOps:
     def compress_by_quality(self, menu, files):
-        if not HAS_PIL:
+        if not has_pngquant() and not has_mogrify() and not HAS_PIL:
             return
 
         win = Gtk.Window(title=Translation.t("dialog_quality_title"))
@@ -95,160 +108,83 @@ class ImageCompressOps:
 
     def _do_quality_compress(self, win, quality, files):
         win.destroy()
-        for f in files:
-            src_path = _uri_to_path(f)
-            if not os.path.isfile(src_path):
-                continue
-            try:
-                img = Image.open(src_path)
-                ext = os.path.splitext(src_path)[1].lower()
-                fmt = FORMAT_MAP.get(ext)
-                if fmt == "JPEG" and img.mode in ("RGBA", "P"):
-                    img = img.convert("RGB")
-                base, old_ext = os.path.splitext(src_path)
-                dst_path = f"{base}_compressed{old_ext}"
-                save_kwargs = {}
-                if fmt in ("JPEG", "WEBP"):
-                    save_kwargs["quality"] = quality
-                elif fmt == "PNG":
-                    save_kwargs["optimize"] = True
-                img.save(dst_path, fmt, **save_kwargs)
-            except Exception:
-                pass
+        paths = [_uri_to_path(f) for f in files]
+        threading.Thread(
+            target=self._run_quality_compress,
+            args=(quality, paths),
+            daemon=True,
+        ).start()
 
-    def resize_by_dimensions(self, menu, files):
-        if not HAS_PIL:
-            return
+    def _run_quality_compress(self, quality, paths):
+        """Compress images in a worker thread with ordered per-file fallback.
 
-        # Get original dimensions from first image
-        default_w, default_h = 800, 600
-        first_path = _uri_to_path(files[0])
-        if os.path.isfile(first_path):
-            try:
-                with Image.open(first_path) as img:
-                    default_w, default_h = img.size
-            except Exception:
-                pass
+        PNG: pngquant -> ImageMagick -> PIL
+        Other: ImageMagick -> PIL
+        """
+        png_paths = [
+            p for p in paths
+            if os.path.splitext(p)[1].lower() in PNG_EXTS
+        ]
+        other_paths = [p for p in paths if p not in png_paths]
 
-        win = Gtk.Window(title=Translation.t("dialog_dimensions_title"))
-        win.set_default_size(350, 200)
-        win.set_modal(True)
+        logger.info("Quality compress: %d PNG, %d other, quality=%d",
+                    len(png_paths), len(other_paths), quality)
 
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-        box.set_margin_top(20)
-        box.set_margin_bottom(20)
-        box.set_margin_start(20)
-        box.set_margin_end(20)
+        results = []
+        suffix = f"_q{int(quality)}"
 
-        label_w = Gtk.Label(label=Translation.t("dialog_width_label").format(w=default_w))
-        adj_w = Gtk.Adjustment(value=default_w, lower=1, upper=65535, step_increment=1, page_increment=100)
-        spin_w = Gtk.SpinButton()
-        spin_w.set_adjustment(adj_w)
+        for group in self._groups(png_paths):
+            remaining = group
+            if has_pngquant():
+                outputs = pngquant_batch(group, quality, suffix=suffix)
+                results.extend(outputs)
+                remaining = _unprocessed_paths(group, outputs, suffix)
 
-        label_h = Gtk.Label(label=Translation.t("dialog_height_label").format(h=default_h))
-        adj_h = Gtk.Adjustment(value=default_h, lower=1, upper=65535, step_increment=1, page_increment=100)
-        spin_h = Gtk.SpinButton()
-        spin_h.set_adjustment(adj_h)
+            if remaining and has_mogrify():
+                outputs = im_compress_batch(
+                    remaining, os.path.dirname(remaining[0]), quality
+                )
+                results.extend(outputs)
+                remaining = _unprocessed_paths(remaining, outputs, suffix)
 
-        box.append(label_w)
-        box.append(spin_w)
-        box.append(label_h)
-        box.append(spin_h)
+            if remaining and HAS_PIL:
+                for path in remaining:
+                    output = _pil_compress_one(path, quality)
+                    if output:
+                        results.append(output)
 
-        btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-        btn_box.set_halign(Gtk.Align.END)
+        for group in self._groups(other_paths):
+            remaining = group
+            if has_mogrify():
+                outputs = im_compress_batch(
+                    group, os.path.dirname(group[0]), quality
+                )
+                results.extend(outputs)
+                remaining = _unprocessed_paths(group, outputs, suffix)
 
-        cancel_btn = Gtk.Button(label=Translation.t("dialog_cancel"))
-        cancel_btn.connect("clicked", lambda b: win.destroy())
-        btn_box.append(cancel_btn)
+            if remaining and HAS_PIL:
+                for path in remaining:
+                    output = _pil_compress_one(path, quality)
+                    if output:
+                        results.append(output)
 
-        ok_btn = Gtk.Button(label=Translation.t("dialog_resize"))
-        ok_btn.add_css_class("suggested-action")
-        ok_btn.connect("clicked", lambda b: self._do_resize_dimensions(
-            win, spin_w.get_value_as_int(), spin_h.get_value_as_int(), files))
-        btn_box.append(ok_btn)
+        if results:
+            GLib.idle_add(
+                notify, Translation.t("notify_compress_done"),
+                Translation.t("notify_compress_count").format(
+                    len(results), len(paths)
+                ),
+            )
+        else:
+            GLib.idle_add(
+                notify, Translation.t("notify_compress_done"),
+                Translation.t("notify_no_image_compressed"),
+            )
 
-        box.append(btn_box)
-        win.set_child(box)
-        _connect_spin_keys(spin_w, win, ok_btn)
-        _connect_spin_keys(spin_h, win, ok_btn)
-        win.present()
-
-    def _do_resize_dimensions(self, win, width, height, files):
-        win.destroy()
-        for f in files:
-            src_path = _uri_to_path(f)
-            if not os.path.isfile(src_path):
-                continue
-            try:
-                img = Image.open(src_path)
-                ext = os.path.splitext(src_path)[1].lower()
-                fmt = FORMAT_MAP.get(ext)
-                if fmt == "JPEG" and img.mode in ("RGBA", "P"):
-                    img = img.convert("RGB")
-                img_resized = img.resize((width, height), Image.LANCZOS)
-                base, old_ext = os.path.splitext(src_path)
-                dst_path = f"{base}_resized{old_ext}"
-                img_resized.save(dst_path, fmt)
-            except Exception:
-                pass
-
-    def resize_by_percent(self, menu, files):
-        if not HAS_PIL:
-            return
-
-        win = Gtk.Window(title=Translation.t("dialog_percent_title"))
-        win.set_default_size(350, 150)
-        win.set_modal(True)
-
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-        box.set_margin_top(20)
-        box.set_margin_bottom(20)
-        box.set_margin_start(20)
-        box.set_margin_end(20)
-
-        label = Gtk.Label(label=Translation.t("dialog_percent_label"))
-        adj = Gtk.Adjustment(value=50, lower=1, upper=100, step_increment=1, page_increment=10)
-        spin = Gtk.SpinButton()
-        spin.set_adjustment(adj)
-        box.append(label)
-        box.append(spin)
-
-        btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-        btn_box.set_halign(Gtk.Align.END)
-
-        cancel_btn = Gtk.Button(label=Translation.t("dialog_cancel"))
-        cancel_btn.connect("clicked", lambda b: win.destroy())
-        btn_box.append(cancel_btn)
-
-        ok_btn = Gtk.Button(label=Translation.t("dialog_resize"))
-        ok_btn.add_css_class("suggested-action")
-        ok_btn.connect("clicked", lambda b: self._do_resize_percent(win, spin.get_value(), files))
-        btn_box.append(ok_btn)
-
-        box.append(btn_box)
-        win.set_child(box)
-        _connect_spin_keys(spin, win, ok_btn)
-        win.present()
-
-    def _do_resize_percent(self, win, percent, files):
-        win.destroy()
-        scale = percent / 100.0
-        for f in files:
-            src_path = _uri_to_path(f)
-            if not os.path.isfile(src_path):
-                continue
-            try:
-                img = Image.open(src_path)
-                ext = os.path.splitext(src_path)[1].lower()
-                fmt = FORMAT_MAP.get(ext)
-                if fmt == "JPEG" and img.mode in ("RGBA", "P"):
-                    img = img.convert("RGB")
-                new_w = max(1, int(img.width * scale))
-                new_h = max(1, int(img.height * scale))
-                img_resized = img.resize((new_w, new_h), Image.LANCZOS)
-                base, old_ext = os.path.splitext(src_path)
-                dst_path = f"{base}_resized{old_ext}"
-                img_resized.save(dst_path, fmt)
-            except Exception:
-                pass
+    @staticmethod
+    def _groups(paths):
+        groups = {}
+        for path in paths:
+            parent = os.path.dirname(path)
+            groups.setdefault(parent, []).append(path)
+        return groups.values()
