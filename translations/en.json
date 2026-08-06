@@ -38,5 +38,8 @@
   "dialog_resize": "Resize",
 
   "dialog_percent_title": "Resize by Percent",
-  "dialog_percent_label": "Scale percentage (1-100):"
+  "dialog_percent_label": "Scale percentage (1-100):",
+
+  "notify_file_checksum_ok": "{} copied to clipboard",
+  "notify_files_checksum_ok": "{} of {} files copied to clipboard"
 }
