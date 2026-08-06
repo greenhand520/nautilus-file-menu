@@ -1,9 +1,9 @@
 {
   "items": {
-    "path": true,
-    "uri": false,
-    "name": true,
-    "content": false,
+    "copy_path": true,
+    "copy_uri": false,
+    "copy_name": true,
+    "copy_content": true,
     "dissolve_folder": true,
     "move_into_folder": true,
     "open_ide": true,
@@ -16,27 +16,28 @@
     "primary": true
   },
   "shortcuts": {
-    "path": "<Ctrl><Shift>C",
-    "uri": "<Ctrl><Shift>U",
-    "name": "<Ctrl><Shift>D",
-    "content": "<Ctrl><Shift>G"
+    "copy_path": "<Ctrl><Shift>C",
+    "copy_uri": "<Ctrl><Shift>U",
+    "copy_name": "<Ctrl><Shift>D",
+    "copy_content": "<Ctrl><Shift>G"
   },
   "language": "auto",
-  "separator": ", ",
+  "log_level": "INFO",
+  "separator": "\n",
   "escape_value_items": false,
   "escape_value": false,
   "name_ignore_extension": false,
   "ide_commands": {
-    "vscode": "code",
-    "code-insiders": "code-insiders",
-    "code-oss": "code-oss",
-    "zed": "zed"
+    "Visual Studio Code": "code",
+    "Visual Studio Code - Insiders": "code-insiders",
+    "Code - OSS": "code-oss",
+    "Zed": "zed"
   },
   "flatpak_ids": {
-    "vscode": "com.visualstudio.code",
-    "code-insiders": "com.visualstudio.code.insiders",
-    "code-oss": "com.visualstudio.code-oss",
-    "zed": "dev.zed.Zed"
+    "Visual Studio Code": "com.visualstudio.code",
+    "Visual Studio Code - Insiders": "com.visualstudio.code.insiders",
+    "Code - OSS": "com.visualstudio.code-oss",
+    "Zed": "dev.zed.Zed"
   },
   "jetbrains_commands": {
     "IntelliJ IDEA": "idea",
@@ -47,7 +48,8 @@
     "Rider": "rider",
     "RubyMine": "rubymine",
     "PhpStorm": "phpstorm",
-    "DataGrip": "datagrip"
+    "DataGrip": "datagrip",
+    "RustRover": "rustrover"
   },
   "image_formats": ["PNG", "JPEG", "WEBP", "BMP", "TIFF"],
   "checksum_algorithms": ["md5", "sha1", "sha256", "sha512"]
