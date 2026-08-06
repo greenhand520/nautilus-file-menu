@@ -1,10 +1,13 @@
 import os
+
 from gi import require_version
+
 require_version('Gtk', '4.0')
-from gi.repository import Gtk, Gdk, Gio, GLib
+from gi.repository import Gtk, Gdk, GLib
 from translation import Translation
 from .path_utils import uri_to_path as _uri_to_path
 from .notify import logger
+from .gio_utils import gio_move, gio_delete, gio_make_directories
 
 
 def _unique_dst(parent, item_name):
@@ -18,13 +21,6 @@ def _unique_dst(parent, item_name):
         dst = os.path.join(parent, f"{base}_{counter}{ext}")
         counter += 1
     return dst
-
-
-def _gio_move(src_path, dst_path):
-    """Move a file using Gio.File.move."""
-    src = Gio.File.new_for_path(src_path)
-    dst = Gio.File.new_for_path(dst_path)
-    src.move(dst, Gio.FileCopyFlags.NONE, None, None, None)
 
 
 class FolderOps:
@@ -42,10 +38,10 @@ class FolderOps:
         for item_name in os.listdir(folder_path):
             src = os.path.join(folder_path, item_name)
             dst = _unique_dst(parent_path, item_name)
-            _gio_move(src, dst)
+            gio_move(src, dst)
 
         try:
-            Gio.File.new_for_path(folder_path).delete(None)
+            gio_delete(folder_path)
         except GLib.Error as e:
             logger.error("dissolve_folder: failed to remove folder: %s", e.message)
 
@@ -114,8 +110,8 @@ class FolderOps:
         new_folder = os.path.join(str(parent_path), folder_name)
 
         # Create folder using Gio
-        Gio.File.new_for_path(new_folder).make_directory_with_parents(None)
+        gio_make_directories(new_folder)
 
         for src in paths:
             dst = _unique_dst(new_folder, os.path.basename(src))
-            _gio_move(src, dst)
+            gio_move(src, dst)
