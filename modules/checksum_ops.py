@@ -1,9 +1,11 @@
 import hashlib
 import os
+
 from gi.repository import GLib
-from .path_utils import uri_to_path as _uri_to_path
-from .notify import notify, logger
+
 from translation import Translation
+from .file_utils import uri_to_path as _uri_to_path
+from .notify import notify, logger
 
 ALGORITHMS = {
     "md5": hashlib.md5,

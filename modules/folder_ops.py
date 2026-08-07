@@ -3,15 +3,15 @@ import os
 from gi import require_version
 
 require_version('Gtk', '4.0')
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gtk, Gdk
 from translation import Translation
-from .path_utils import uri_to_path as _uri_to_path
+from .file_utils import uri_to_path as _uri_to_path
 from .notify import logger
-from .gio_utils import gio_move, gio_delete, gio_make_directories
+from .file_utils import file_move, file_delete, gio_make_directories
 
 
 def _unique_dst(parent, item_name):
-    """Return a unique destination path in parent, appending _N if needed."""
+    """返回父级中唯一的目标路径，如果需要则附加 _N。"""
     dst = os.path.join(parent, item_name)
     if not os.path.exists(dst):
         return dst
@@ -35,18 +35,25 @@ class FolderOps:
 
         parent_path = os.path.dirname(folder_path)
 
+        move_failed = False
         for item_name in os.listdir(folder_path):
             src = os.path.join(folder_path, item_name)
             dst = _unique_dst(parent_path, item_name)
-            gio_move(src, dst)
+            if not file_move(src, dst):
+                move_failed = True
+                logger.error("dissolve_folder: failed to move %s -> %s", src, dst)
 
-        try:
-            gio_delete(folder_path)
-        except GLib.Error as e:
-            logger.error("dissolve_folder: failed to remove folder: %s", e.message)
+        # 如果无法移动项目，不删除源目录。
+        # 使得操作的成功/失败状态变得明确而不是依赖 Gio.delete()
+        if move_failed:
+            logger.error("dissolve_folder: source directory was not removed: %s", folder_path)
+            return
+
+        if not file_delete(folder_path):
+            logger.error("dissolve_folder: failed to remove folder: %s", folder_path)
 
     def move_into_folder(self, menu, files):
-        """Create a new folder and move all selected files into it."""
+        """创建一个新文件夹并将所有选定的文件移入"""
         if len(files) < 2:
             return
 
@@ -109,9 +116,8 @@ class FolderOps:
         parent_path = os.path.dirname(paths[0])
         new_folder = os.path.join(str(parent_path), folder_name)
 
-        # Create folder using Gio
         gio_make_directories(new_folder)
 
         for src in paths:
             dst = _unique_dst(new_folder, os.path.basename(src))
-            gio_move(src, dst)
+            file_move(src, dst)

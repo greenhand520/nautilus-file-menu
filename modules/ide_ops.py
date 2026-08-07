@@ -1,9 +1,10 @@
-import subprocess
-import os
-import glob
 import configparser
+import glob
+import os
+import subprocess
+
+from .file_utils import uri_to_path as _uri_to_path, find_binary
 from .notify import logger
-from .path_utils import uri_to_path as _uri_to_path, find_binary
 
 IDE_COMMANDS = {
     "Visual Studio Code": "code",
@@ -53,7 +54,7 @@ NON_IDE_MIME_PREFIXES = [
 ]
 
 
-def _is_file_openable_in_ide(file):
+def is_file_openable_in_ide(file):
     mime = file.get_mime_type()
     return not any(mime.startswith(p) for p in NON_IDE_MIME_PREFIXES)
 
