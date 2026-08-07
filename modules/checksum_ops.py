@@ -13,8 +13,8 @@ ALGORITHMS = {
     "sha256": hashlib.sha256,
     "sha512": hashlib.sha512,
 }
-
-CHUNK_SIZE = 65536  # 64KB per idle tick
+# 64KB per idle tick
+CHUNK_SIZE = 65536
 
 
 class ChecksumOps:
@@ -25,7 +25,7 @@ class ChecksumOps:
         self.algorithms = config.get("checksum_algorithms", ["md5", "sha1", "sha256", "sha512"])
 
     def compute_checksum(self, menu, files, algo_name):
-        """Compute checksum of selected files and copy to clipboard."""
+        """计算所选文件的校验和并复制到剪贴板"""
         hasher_cls = ALGORITHMS.get(algo_name)
         if not hasher_cls:
             return
@@ -35,8 +35,8 @@ class ChecksumOps:
         GLib.idle_add(self._hash_step, algo_name, hasher_cls, paths, 0, results, None, None)
 
     def _hash_step(self, algo_name: str, hasher_cls, paths, file_index, results, fh, hasher):
-        """Process one chunk per idle tick. Returns True to continue, False when done."""
-        # If we have an open file, continue reading chunks
+        """每个空闲周期处理一个块。返回 True 继续，返回 False 完成"""
+        # 文件不为空，则继续读取块
         if fh is not None:
             try:
                 chunk = fh.read(CHUNK_SIZE)

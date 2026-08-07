@@ -7,8 +7,6 @@
     "dissolve_folder": true,
     "move_into_folder": true,
     "open_ide": true,
-    "image_convert": true,
-    "image_compress": true,
     "checksum": true
   },
   "selections": {
@@ -22,7 +20,7 @@
     "copy_content": "<Ctrl><Shift>G"
   },
   "language": "auto",
-  "log_level": "INFO",
+  "log_level": "WARNING",
   "separator": "\n",
   "escape_value_items": false,
   "escape_value": false,
@@ -51,6 +49,5 @@
     "DataGrip": "datagrip",
     "RustRover": "rustrover"
   },
-  "image_formats": ["PNG", "JPG", "WEBP", "BMP", "TIFF"],
   "checksum_algorithms": ["md5", "sha1", "sha256", "sha512"]
 }

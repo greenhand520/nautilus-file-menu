@@ -1,21 +1,17 @@
-import os
 import json
+import os
 import traceback
 from typing import Any
-from urllib.parse import urlparse, unquote
-from translation import Translation
-from modules.copy_ops import CopyOps
-from modules.folder_ops import FolderOps
-from modules.path_utils import uri_to_path as _uri_to_path
-from modules.ide_ops import IdeOps, _is_file_openable_in_ide
-from modules.image_convert_ops import ImageConvertOps
-from modules.image_compress_ops import ImageCompressOps
-from modules.image_utils import is_image_file
-from modules.image_resize_ops import ImageResizeOps
-from modules.checksum_ops import ChecksumOps
-from modules.notify import set_log_level
+
 from gi import require_version
-import gi
+
+from modules.checksum_ops import ChecksumOps
+from modules.copy_ops import CopyOps
+from modules.file_utils import uri_to_path as _uri_to_path
+from modules.folder_ops import FolderOps
+from modules.ide_ops import IdeOps, is_file_openable_in_ide
+from modules.notify import set_log_level
+from translation import Translation
 
 require_version('Gtk', '4.0')
 from gi.repository import Nautilus, GObject, Gtk, Gdk, GLib
@@ -53,8 +49,6 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 "dissolve_folder": True,
                 "move_into_folder": True,
                 "open_ide": True,
-                "image_convert": True,
-                "image_compress": True,
                 "checksum": True,
             },
             "selections": {
@@ -95,7 +89,6 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 "PhpStorm": "phpstorm",
                 "DataGrip": "datagrip",
             },
-            "image_formats": ["PNG", "JPEG", "WEBP", "BMP", "TIFF"],
             "checksum_algorithms": ["md5", "sha1", "sha256", "sha512"],
             "log_level": "WARNING",
         }
@@ -115,9 +108,6 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         self.copy_ops = CopyOps(self.config, self.clipboard, self.primary_clipboard)
         self.folder_ops = FolderOps()
         self.ide_ops = IdeOps(self.config)
-        self.image_ops = ImageConvertOps(self.config)
-        self.image_compress_ops = ImageCompressOps()
-        self.image_resize_ops = ImageResizeOps()
         self.checksum_ops = ChecksumOps(self.config, self.clipboard, self.primary_clipboard)
 
         app = Gtk.Application.get_default()
@@ -164,15 +154,14 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         items.extend(self._create_copy_items(files, group, config_items))
         items.extend(self._create_folder_items(files, group, config_items))
         items.extend(self._create_ide_items(files, group, config_items))
-        items.extend(self._create_image_convert_items(files, group, config_items))
-        items.extend(self._create_image_compress_items(files, group, config_items))
         items.extend(self._create_checksum_items(files, group, config_items))
 
         return items
 
     # --- Copy operations ---
 
-    def _create_copy_items(self, files: list[Nautilus.FileInfo], group, config_items: dict[str, bool]) -> list[Nautilus.MenuItem]:
+    def _create_copy_items(self, files: list[Nautilus.FileInfo], group,
+                           config_items: dict[str, bool]) -> list[Nautilus.MenuItem]:
         items = []
         plural = len(files) > 1
 
@@ -215,7 +204,8 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
     # --- Folder operations ---
 
-    def _create_folder_items(self, files: list[Nautilus.FileInfo], group, config_items: dict[str, bool]):
+    def _create_folder_items(self, files: list[Nautilus.FileInfo], group,
+                             config_items: dict[str, bool]) -> list[Nautilus.MenuItem]:
         items = []
 
         if (
@@ -242,14 +232,15 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
     # --- IDE operations (single file/folder only) ---
 
-    def _create_ide_items(self, files: list[Nautilus.FileInfo], group, config_items: dict[str, bool]):
+    def _create_ide_items(self, files: list[Nautilus.FileInfo], group,
+                          config_items: dict[str, bool]) -> list[Nautilus.MenuItem]:
         items = []
 
         if not config_items.get("open_ide", True):
             return items
         if len(files) != 1:
             return items
-        if not _is_file_openable_in_ide(files[0]):
+        if not is_file_openable_in_ide(files[0]):
             return items
 
         other_ides = self.ide_ops.get_other_ides()
@@ -301,103 +292,10 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
         return items
 
-    # --- Image conversion ---
-
-    def _create_image_convert_items(self, files: list[Nautilus.FileInfo], group, config_items: dict[str, bool]):
-        items = []
-
-        if not config_items.get("image_convert", True):
-            return items
-
-        image_files = [f for f in files if is_image_file(f)]
-        if not image_files:
-            return items
-
-        formats = self.image_ops.get_format_items()
-        if not formats:
-            return items
-
-        submenu = Nautilus.Menu()
-        for fmt in formats:
-            sub_item = Nautilus.MenuItem(
-                name="NautilusFileMenu::ConvertImage_" + fmt + group,
-                label=fmt,
-            )
-            sub_item.connect(
-                "activate",
-                lambda m, f, fmt_=fmt: self.image_ops.convert_image(m, f, fmt_),
-                image_files,
-            )
-            submenu.append_item(sub_item)
-
-        menu_item = Nautilus.MenuItem(
-            name="NautilusFileMenu::ConvertImage" + group,
-            label=Translation.t("image_convert_submenu"),
-        )
-        menu_item.set_submenu(submenu)
-        items.append(menu_item)
-
-        return items
-
-    # --- Image compression ---
-
-    def _create_image_compress_items(self, files: list[Nautilus.FileInfo], group, config_items: dict[str, bool]):
-        items = []
-
-        if not config_items.get("image_compress", True):
-            return items
-
-        compress_files = [f for f in files if is_image_file(f)]
-        if not compress_files:
-            return items
-
-        submenu = Nautilus.Menu()
-
-        quality_item = Nautilus.MenuItem(
-            name="NautilusFileMenu::CompressQuality" + group,
-            label=Translation.t("compress_by_quality"),
-        )
-        quality_item.connect(
-            "activate",
-            lambda m, f: self.image_compress_ops.compress_by_quality(m, f),
-            compress_files,
-        )
-        submenu.append_item(quality_item)
-
-        size_item = Nautilus.MenuItem(
-            name="NautilusFileMenu::CompressDimensions" + group,
-            label=Translation.t("resize_by_dimensions"),
-        )
-        size_item.connect(
-            "activate",
-            lambda m, f: self.image_resize_ops.resize_by_dimensions(m, f),
-            compress_files,
-        )
-        submenu.append_item(size_item)
-
-        percent_item = Nautilus.MenuItem(
-            name="NautilusFileMenu::CompressPercent" + group,
-            label=Translation.t("resize_by_percent"),
-        )
-        percent_item.connect(
-            "activate",
-            lambda m, f: self.image_resize_ops.resize_by_percent(m, f),
-            compress_files,
-        )
-        submenu.append_item(percent_item)
-
-        menu_item = Nautilus.MenuItem(
-            name="NautilusFileMenu::ImageCompress" + group,
-            label=Translation.t("image_compress_submenu"),
-        )
-        menu_item.set_submenu(submenu)
-        items.append(menu_item)
-
-        return items
-
     # --- Checksum ---
 
-    def _create_checksum_items(self, files, group, config_items: dict[str, bool]):
+    def _create_checksum_items(self, files: list[Nautilus.FileInfo], group,
+                               config_items: dict[str, bool]) -> list[Nautilus.MenuItem]:
         items = []
 
         if not config_items.get("checksum", True):

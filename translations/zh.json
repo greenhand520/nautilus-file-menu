@@ -11,49 +11,19 @@
   "open_with_ide": "用 {ide} 打开",
   "open_with_ide_submenu": "用 IDE 打开",
   "open_with_jetbrains": "JetBrains",
-  "image_convert_submenu": "图像转换为",
-  "convert_to": "转换为 {format}",
-  "image_compress_submenu": "图像压缩",
-  "compress_by_quality": "按质量压缩...",
-  "resize_by_dimensions": "按尺寸缩放...",
-  "resize_by_percent": "按百分比缩放...",
   "checksum_submenu": "校验和",
   "checksum": "校验和 ({algo})",
 
   "dialog_cancel": "取消",
   "dialog_ok": "确定",
+  "dialog_continue": "继续",
 
   "dialog_move_into_folder_title": "收进文件夹",
   "dialog_folder_name_label": "请输入文件夹名称：",
   "dialog_default_folder_name": "新文件夹",
   "dialog_create": "创建",
 
-  "dialog_quality_title": "按质量压缩",
-  "dialog_quality_label": "质量百分比 (1-100)：",
-  "dialog_compress": "压缩",
-
-  "dialog_dimensions_title": "按尺寸缩放",
-  "dialog_width_label": "宽度 (像素) — 原始 {w}：",
-  "dialog_height_label": "高度 (像素) — 原始 {h}：",
-  "dialog_resize": "缩放",
-
-  "dialog_percent_title": "按百分比缩放",
-  "dialog_percent_label": "缩放百分比 (1-100)：",
-
   "notify_file_checksum_ok": "{}已复制到剪贴板",
   "notify_files_checksum_ok": "{}个文件的{}已复制到剪贴板",
-
-  "notify_file_contents_copied": "文件 {} 内容已复制到剪贴板",
-
-  "notify_image_convert_tool_not_installed": "未安装 ImageMagick 或 PIL",
-  "notify_image_converted": "图像转换完成",
-  "notify_no_image_converted": "没有文件被转换",
-  "notify_image_converted_count": "成功转换 {}/{} 个文件",
-
-  "notify_compress_done": "质量压缩完成",
-  "notify_no_image_compressed": "没有文件被压缩（输出可能更大）",
-  "notify_compress_count": "成功压缩 {}/{} 个文件",
-
-  "notify_resize_done": "缩放完成",
-  "notify_resize_count": "处理了 {}/{} 个文件"
+  "notify_file_contents_copied": "文件 {} 内容已复制到剪贴板"
 }
