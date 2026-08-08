@@ -34,6 +34,15 @@ A feature-rich right-click context menu extension for Nautilus (GNOME Files).
 - Single terminal shows directly, multiple terminals in submenu
 - Only appears when right-clicking a directory or folder background
 
+### AppImage
+- Extract AppImage files using `--appimage-extract`
+- Extracted contents are placed in a `_extracted` folder next to the AppImage
+
+### Launch Desktop File
+- Launch programs directly from `.desktop` files
+- Parses the `Exec` field and runs the program
+- Supports `Terminal=true` entries (auto-finds terminal emulator)
+
 ### Checksum
 - Supported algorithms: MD5, SHA1, SHA256, SHA512 (configurable)
 - Results automatically copied to clipboard
@@ -142,15 +151,16 @@ Toggle which features appear in the context menu:
 }
 ```
 
-| Key | Description |
-|-----|-------------|
-| `other_ides.<name>.enabled` | Enable/disable this IDE |
-| `other_ides.<name>.cmd` | Command array. First element is the binary name (searched in PATH, `~/.local/bin`, `/usr/local/bin`) |
-| `other_ides.<name>.flatpak` | Flatpak fallback: first element is app ID, rest are args. Empty array to skip |
-| `jetbrains_ides.collapse_menu` | `true`: fold JetBrains into submenu; `false`: list directly in IDE menu |
-| `jetbrains_ides.<name>.enabled` | Enable/disable this JetBrains IDE |
-| `jetbrains_ides.<name>.cmd` | Command array. First element is the binary name (also searches JetBrains Toolbox dirs) |
-| `jetbrains_ides.<name>.flatpak` | Flatpak fallback: first element is app ID, rest are args. Empty array to skip |
+| Key | Description                                                                                                                                       |
+|-----|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `exclude_mime` | MIME type prefixes to exclude from IDE menu (e.g. `"video/"`, `"application/x-rpm"`), common exclusion MIME types have been integrated internally |
+| `other_ides.<name>.enabled` | Enable/disable this IDE                                                                                                                           |
+| `other_ides.<name>.cmd` | Command array. First element is the binary name (searched in PATH, `~/.local/bin`, `/usr/local/bin`)                                              |
+| `other_ides.<name>.flatpak` | Flatpak fallback: first element is app ID, rest are args. Empty array to skip                                                                     |
+| `jetbrains_ides.collapse_menu` | `true`: fold JetBrains into submenu; `false`: list directly in IDE menu                                                                           |
+| `jetbrains_ides.<name>.enabled` | Enable/disable this JetBrains IDE                                                                                                                 |
+| `jetbrains_ides.<name>.cmd` | Command array. First element is the binary name (also searches JetBrains Toolbox dirs)                                                            |
+| `jetbrains_ides.<name>.flatpak` | Flatpak fallback: first element is app ID, rest are args. Empty array to skip                                                                     |
 
 > **Tip**: To add a new IDE, add an entry to `other_ides` or `jetbrains_ides` with the binary name in `cmd` and optionally a Flatpak app ID in `flatpak`. The first element of `cmd` is used for detection. You can find app’s Flatpak ID on the [flathub](https://flathub.org) website.
 

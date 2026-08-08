@@ -11,6 +11,8 @@ from modules.file_utils import uri_to_path as _uri_to_path, COPY_CONTENT_MIME_TY
 from modules.folder_ops import FolderOps
 from modules.ide_ops import IdeOps, is_file_openable_in_ide
 from modules.terminal_ops import TerminalOps
+from modules.appimage_ops import AppImageOps, is_appimage
+from modules.launch_ops import LaunchOps
 from modules.notify import set_log_level, logger
 import translation
 
@@ -49,6 +51,8 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 "move_into_folder": True,
                 "open_ide": True,
                 "open_terminal": True,
+                "appimage": True,
+                "launch_desktop": True,
                 "checksum": True,
             },
             "language": "auto",
@@ -97,6 +101,8 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         self.folder_ops = FolderOps()
         self.ide_ops = IdeOps(self.config)
         self.terminal_ops = TerminalOps(self.config)
+        self.appimage_ops = AppImageOps()
+        self.launch_ops = LaunchOps(self.terminal_ops)
         self.checksum_ops = ChecksumOps(self.config, self.clipboard, self.primary_clipboard)
 
         app = Gtk.Application.get_default()
@@ -162,6 +168,8 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         items.extend(self._create_folder_items(files, group, ops))
         items.extend(self._create_ide_items(files, group, ops))
         items.extend(self._create_terminal_items(files, group, ops))
+        items.extend(self._create_appimage_items(files, group, ops))
+        items.extend(self._create_launch_items(files, group, ops))
         items.extend(self._create_checksum_items(files, group, ops))
 
         return items
@@ -284,7 +292,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             return items
         if len(files) != 1:
             return items
-        if not is_file_openable_in_ide(files[0]):
+        if not is_file_openable_in_ide(files[0], self.config):
             return items
 
         other_ides = self.ide_ops.get_other_ides()
@@ -445,6 +453,47 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 items.append(item)
 
         return items
+
+    # --- AppImage operations ---
+
+    def _create_appimage_items(self, files: list[Nautilus.FileInfo], group,
+                               ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
+        if not ops.get("appimage", True):
+            return []
+
+        # Only show if at least one selected file is an AppImage
+        has_appimage = any(is_appimage(_uri_to_path(f)) for f in files)
+        if not has_appimage:
+            return []
+
+        item = Nautilus.MenuItem(
+            name="NautilusFileMenu::ExtractAppImage" + group,
+            label=translation.gettext("extract_appimage"),
+        )
+        item.connect("activate", self.appimage_ops.extract, files)
+        return [item]
+
+    # --- Launch desktop file operations ---
+
+    def _create_launch_items(self, files: list[Nautilus.FileInfo], group,
+                             ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
+        if not ops.get("launch_desktop", True):
+            return []
+
+        # Only show if at least one selected file is a .desktop file
+        has_desktop = any(
+            _uri_to_path(f).endswith(".desktop") and os.path.isfile(_uri_to_path(f))
+            for f in files
+        )
+        if not has_desktop:
+            return []
+
+        item = Nautilus.MenuItem(
+            name="NautilusFileMenu::LaunchDesktop" + group,
+            label=translation.gettext("launch_desktop"),
+        )
+        item.connect("activate", self.launch_ops.launch_desktop_file, files)
+        return [item]
 
     # --- Checksum ---
 

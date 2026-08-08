@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-file-menu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 20:04+0800\n"
+"POT-Creation-Date: 2026-08-08 22:58+0800\n"
 "PO-Revision-Date: 2026-08-08\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -15,74 +15,94 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: nautilus_file_menu.py:184
+#: nautilus_file_menu.py:192
 msgid "copy_paths"
 msgstr "Copy paths"
 
-#: nautilus_file_menu.py:184
+#: nautilus_file_menu.py:192
 msgid "copy_path"
 msgstr "Copy path"
 
-#: nautilus_file_menu.py:188
+#: nautilus_file_menu.py:196
 msgid "copy_uris"
 msgstr "Copy URIs"
 
-#: nautilus_file_menu.py:188
+#: nautilus_file_menu.py:196
 msgid "copy_uri"
 msgstr "Copy URI"
 
-#: nautilus_file_menu.py:192
+#: nautilus_file_menu.py:200
 msgid "copy_names"
 msgstr "Copy names"
 
-#: nautilus_file_menu.py:192
+#: nautilus_file_menu.py:200
 msgid "copy_name"
 msgstr "Copy name"
 
-#: nautilus_file_menu.py:200
+#: nautilus_file_menu.py:208
 msgid "copy_content"
 msgstr "Copy content"
 
-#: nautilus_file_menu.py:231
+#: nautilus_file_menu.py:239
 msgid "copy_more"
 msgstr "Copy more"
 
-#: nautilus_file_menu.py:260
+#: nautilus_file_menu.py:270 modules/folder_ops.py:48
 msgid "dissolve_folder"
 msgstr "Dissolve folder"
 
-#: nautilus_file_menu.py:268
+#: nautilus_file_menu.py:278
 msgid "move_into_folder"
 msgstr "Move into folder"
 
-#: nautilus_file_menu.py:300
+#: nautilus_file_menu.py:310
 msgid "open_with_ide"
 msgstr "Open with %(ide)s"
 
-#: nautilus_file_menu.py:356
+#: nautilus_file_menu.py:366
 msgid "open_with_jetbrains"
 msgstr "JetBrains"
 
-#: nautilus_file_menu.py:376
+#: nautilus_file_menu.py:386
 msgid "open_with_ide_submenu"
 msgstr "Open with IDE"
 
-#: nautilus_file_menu.py:404 nautilus_file_menu.py:417
-#: nautilus_file_menu.py:436
+#: nautilus_file_menu.py:414 nautilus_file_menu.py:427
+#: nautilus_file_menu.py:446
 msgid "open_in_terminal"
 msgstr "Open in %(name)s"
 
-#: nautilus_file_menu.py:428
+#: nautilus_file_menu.py:438
 msgid "open_in_terminal_submenu"
 msgstr "Open in terminal"
 
-#: nautilus_file_menu.py:468
+#: nautilus_file_menu.py:474
+msgid "extract_appimage"
+msgstr "Extract AppImage"
+
+#: nautilus_file_menu.py:496
+msgid "launch_desktop"
+msgstr "Launch Program"
+
+#: nautilus_file_menu.py:522
 msgid "checksum"
 msgstr "Checksum (%(algo)s)"
 
-#: nautilus_file_menu.py:492
+#: nautilus_file_menu.py:546
 msgid "checksum_submenu"
 msgstr "Checksum"
+
+#: modules/appimage_ops.py:60 modules/appimage_ops.py:65
+msgid "notify_appimage_extract_done"
+msgstr "AppImage extraction completed"
+
+#: modules/appimage_ops.py:61
+msgid "notify_appimage_extract_count"
+msgstr "Successfully extracted %(count)s file(s)"
+
+#: modules/appimage_ops.py:66
+msgid "notify_appimage_extract_failed"
+msgstr "No files were extracted"
 
 #: modules/checksum_ops.py:95
 msgid "notify_file_checksum_ok"
@@ -96,34 +116,48 @@ msgstr "%(algo)s for %(count)s files copied to clipboard"
 msgid "notify_file_contents_copied"
 msgstr "Contents of file %(file)s copied to clipboard"
 
-#: modules/folder_ops.py:64
-msgid "dialog_move_into_folder_title"
-msgstr "Move into folder"
-
-#: modules/folder_ops.py:74
-msgid "dialog_folder_name_label"
-msgstr "Enter folder name:"
-
-#: modules/folder_ops.py:78
-msgid "dialog_default_folder_name"
-msgstr "New folder"
-
-#: modules/folder_ops.py:84
-msgid "dialog_cancel"
-msgstr "Cancel"
-
-#: modules/folder_ops.py:88
-msgid "dialog_create"
-msgstr "Create"
-
+#: modules/folder_ops.py:42
 msgid "dialog_dissolve_confirm"
 msgstr "Dissolve folder \"{name}\"?"
 
+#: modules/folder_ops.py:45
 msgid "dialog_dissolve_confirm_plural"
 msgstr "Dissolve {count} folders?"
 
+#: modules/folder_ops.py:65 modules/folder_ops.py:143
+msgid "dialog_cancel"
+msgstr "Cancel"
+
+#: modules/folder_ops.py:69
 msgid "dialog_dissolve"
 msgstr "Dissolve"
+
+#: modules/folder_ops.py:123
+msgid "dialog_move_into_folder_title"
+msgstr "Move into folder"
+
+#: modules/folder_ops.py:133
+msgid "dialog_folder_name_label"
+msgstr "Enter folder name:"
+
+#: modules/folder_ops.py:137
+msgid "dialog_default_folder_name"
+msgstr "New folder"
+
+#: modules/folder_ops.py:147
+msgid "dialog_create"
+msgstr "Create"
+
+#: modules/launch_ops.py:87
+msgid "notify_launch_done"
+msgstr "Program launch completed"
+
+#: modules/launch_ops.py:88
+msgid "notify_launch_count"
+msgstr "Successfully launched %(count)s program(s)"
+
+msgid "notify_no_terminal"
+msgstr "No terminal emulator found, cannot launch this program"
 
 #~ msgid "dialog_ok"
 #~ msgstr "OK"

@@ -5,6 +5,8 @@
     "move_into_folder": true,
     "open_ide": true,
     "open_terminal": true,
+    "appimage": true,
+    "launch_desktop": true,
     "checksum": true
   },
   "language": "auto",
@@ -39,6 +41,7 @@
     "escape_value": false
   },
   "open_ide": {
+    "exclude_mime": [],
     "other_ides": {
       "Visual Studio Code": {
         "enabled": true,
