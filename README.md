@@ -96,12 +96,14 @@ Toggle which features appear in the context menu:
 
 ```json
 "ops_enabled": {
-  "copy": true,
-  "dissolve_folder": true,
-  "move_into_folder": true,
-  "open_ide": true,
-  "open_terminal": true,
-  "checksum": true
+    "copy": true,
+    "dissolve_folder": true,
+    "move_into_folder": true,
+    "open_ide": true,
+    "open_terminal": true,
+    "appimage": true,
+    "launch_desktop": true,
+    "checksum": true
 }
 ```
 
