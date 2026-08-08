@@ -8,7 +8,7 @@
     "checksum": true
   },
   "language": "auto",
-  "log_level": "DEBUG",
+  "log_level": "WARNING",
   "separator": "\n",
   "copy": {
     "item": {

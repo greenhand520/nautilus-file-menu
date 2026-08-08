@@ -1,7 +1,5 @@
 # Nautilus File Menu
 
-[中文](README_zh.md)
-
 A feature-rich right-click context menu extension for Nautilus (GNOME Files).
 
 **Note⚠️: Only tested on Gnome 50**
@@ -11,43 +9,32 @@ A feature-rich right-click context menu extension for Nautilus (GNOME Files).
 ### Copy Operations
 - **Copy Path** — Copy the absolute file/folder path to clipboard
 - **Copy URI** — Copy the file URI (`file:///...`)
-- **Copy Name** — Copy the file name
+- **Copy Name** — Copy the file name (optionally strip extension)
 - **Copy Content** — Copy the content of text files
 
 ### Folder Operations
-- **Dissolve Folder** — Move all files from a folder to its parent directory, then delete the empty folder
-- **Move into Folder** — Create a new folder and move all selected files into it (dialog prompt for folder name)
+- **Dissolve Folder** — Move all files from a folder to its parent, then delete the empty folder
+  - Confirmation dialog before operation
+  - Supports dissolving multiple folders at once
+  - Symbolic link folders are automatically skipped
+- **Move into Folder** — Create a new folder and move all selected files into it
 
 ### Open with IDE
-- Auto-detects installed IDEs, with support for:
-  - VSCode (`code`)
-  - VSCode Insiders (`code-insiders`)
-  - Code - OSS (`code-oss`)
-  - Zed (`zed`)
-  - JetBrains IDEs (IntelliJ IDEA, PyCharm, CLion, WebStorm, etc.)
-- Flatpak fallback for VSCode and Zed
-- Non-IDE files (media, archives, images) are excluded from this menu
+- Auto-detects installed IDEs (binary → desktop file → flatpak)
+- Supports VSCode, Code-OSS, Zed, and all JetBrains IDEs
+- Single IDE shows directly, multiple IDEs in submenu
+- Also available when right-clicking folder background
 
-### Image Format Conversion
-- Select image files, then use the "Convert Image to" submenu
-- Supported formats: PNG, JPEG, WEBP, BMP, TIFF
-- Powered by Pillow
-- Batch conversion for multiple selected images
-
-### Image Compression
-- **By Quality** — Compress by quality percentage (1–100)
-- **By Dimensions** — Resize to specified width × height (original size shown as default)
-- **By Percent** — Resize by percentage (1–100%)
-- Batch compression for multiple selected images
+### Open in Terminal
+- Auto-detects installed terminals (native binary → flatpak)
+- Supports Ptyxis, Ghostty, Kitty, Alacritty, WezTerm
+- Per-terminal command configuration with `{path}` placeholder
+- Single terminal shows directly, multiple terminals in submenu
+- Only appears when right-clicking a directory or folder background
 
 ### Checksum
-- Select files, then use the "Checksum" submenu
 - Supported algorithms: MD5, SHA1, SHA256, SHA512 (configurable)
-- Results are automatically copied to clipboard
-
-## Screenshoot
-
-![image-20260804103743069](./docs/screenshots/image-20260804103743069.png)![image-20260804104140094](./docs/screenshots/image-20260804104140094.png)![image-20260804104115687](./docs/screenshots/image-20260804104115687.png)![image-20260804104018570](./docs/screenshots/image-20260804104018570.png)![image-20260804104240976](./docs/screenshots/image-20260804104240976.png)
+- Results automatically copied to clipboard
 
 ## Installation
 
@@ -55,13 +42,13 @@ A feature-rich right-click context menu extension for Nautilus (GNOME Files).
 
 ```bash
 # Arch Linux
-sudo pacman -S python-nautilus python-gobject python-pillow
+sudo pacman -S python-nautilus python-gobject
 
 # Ubuntu / Debian
-sudo apt install python3-nautilus python3-gi python3-pil
+sudo apt install python3-nautilus python3-gi
 
 # Fedora
-sudo dnf install nautilus-python python3-gobject python3-pillow
+sudo dnf install nautilus-python python3-gobject
 ```
 
 ### Install
@@ -84,75 +71,146 @@ nautilus -q
 
 Edit `config.json` (installed at `~/.local/share/nautilus-python/extensions/nautilus-file-menu/config.json`):
 
+### Global Settings
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `language` | string | `"auto"` | UI language. `"auto"` detects from system locale, or set to `"en"`, `"zh_CN"`, etc. |
+| `log_level` | string | `"WARNING"` | Log level: `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`. Logs are written to `extension.log` in the extension directory. |
+| `separator` | string | `"\n"` | Separator for joining multiple values when copying paths/names/URIs. |
+
+### ops_enabled — Feature Toggles
+
+Toggle which features appear in the context menu:
+
 ```json
-{
-  "items": {
-    "path": true,
-    "uri": true,
-    "name": true,
-    "content": true,
-    "dissolve_folder": true,
-    "move_into_folder": true,
-    "open_ide": true,
-    "image_convert": true,
-    "image_compress": true,
-    "checksum": true
-  },
-  "shortcuts": {
-    "path": "<Ctrl><Shift>C",
-    "uri": "<Ctrl><Shift>U",
-    "name": "<Ctrl><Shift>D",
-    "content": "<Ctrl><Shift>G"
-  },
-  "ide_commands": {
-    "vscode": "code",
-    "code-insiders": "code-insiders",
-    "code-oss": "code-oss",
-    "zed": "zed"
-  },
-  "flatpak_ids": {
-    "vscode": "com.visualstudio.code",
-    "code-insiders": "com.visualstudio.code.insiders",
-    "code-oss": "com.visualstudio.code-oss",
-    "zed": "dev.zed.Zed"
-  },
-  "jetbrains_commands": {
-    "IntelliJ IDEA": "idea",
-    "PyCharm": "pycharm",
-    "CLion": "clion"
-  },
-  "image_formats": ["PNG", "JPEG", "WEBP", "BMP", "TIFF"],
-  "checksum_algorithms": ["md5", "sha1", "sha256", "sha512"]
+"ops_enabled": {
+  "copy": true,
+  "dissolve_folder": true,
+  "move_into_folder": true,
+  "open_ide": true,
+  "open_terminal": true,
+  "checksum": true
 }
 ```
 
-### Configuration Notes
+### copy — Copy Operations
 
-- **`items`** — Toggle which menu items appear in the context menu
-- **`ide_commands`** — Binary names for IDE detection (searched in PATH, `~/.local/bin`, `/usr/local/bin`, `/usr/bin`)
-- **`flatpak_ids`** — Flatpak app IDs as fallback when native binary is not found
-- **`jetbrains_commands`** — Binary names for JetBrains IDEs (also searches JetBrains Toolbox install directories)
-- **`image_formats`** — Formats available in the "Convert Image to" submenu
-- **`checksum_algorithms`** — Hash algorithms available in the "Checksum" submenu
+```json
+"copy": {
+  "item": {
+    "copy_path":  { "enabled": true, "shortcut": "<Ctrl><Shift>C" },
+    "copy_uri":   { "enabled": true, "shortcut": "<Ctrl><Shift>U" },
+    "copy_name":  { "enabled": true, "shortcut": "<Ctrl><Shift>D", "ignore_extension": false },
+    "copy_content": { "enabled": true, "shortcut": "<Ctrl><Shift>G" }
+  },
+  "collapse_menu": true,
+  "selections": { "clipboard": true, "primary": true },
+  "escape_value_items": false,
+  "escape_value": false
+}
+```
 
-## Keyboard Shortcuts
+| Key | Description |
+|-----|-------------|
+| `item.*.enabled` | Show/hide individual copy items |
+| `item.*.shortcut` | Keyboard shortcut (GTK accelerator format) |
+| `item.copy_name.ignore_extension` | Strip file extension when copying name |
+| `collapse_menu` | `true`: fold into "Copy More" submenu; `false`: list all directly |
+| `selections.clipboard` | Copy to system clipboard |
+| `selections.primary` | Copy to primary clipboard (middle-click paste) |
+| `escape_value_items` | Shell-escape each individual value |
+| `escape_value` | Shell-escape the final joined value |
 
-| Action       | Shortcut         |
-|--------------|------------------|
-| Copy Path    | Ctrl + Shift + C |
-| Copy URI     | Ctrl + Shift + U |
-| Copy Name    | Ctrl + Shift + D |
-| Copy Content | Ctrl + Shift + G |
+### open_ide — IDE Configuration
+
+```json
+"open_ide": {
+  "other_ides": {
+    "Visual Studio Code": {
+      "enabled": true,
+      "cmd": "code",
+      "flatpak_id": "com.visualstudio.code"
+    }
+  },
+  "jetbrains_ides": {
+    "collapse_menu": false,
+    "PyCharm": { "enabled": true, "cmd": "pycharm" }
+  }
+}
+```
+
+| Key | Description |
+|-----|-------------|
+| `other_ides.<name>.enabled` | Enable/disable this IDE |
+| `other_ides.<name>.cmd` | Binary name (searched in PATH, `~/.local/bin`, `/usr/local/bin`) |
+| `other_ides.<name>.flatpak_id` | Flatpak app ID as fallback when native binary is not found |
+| `jetbrains_ides.collapse_menu` | `true`: fold JetBrains into submenu; `false`: list directly in IDE menu |
+| `jetbrains_ides.<name>.enabled` | Enable/disable this JetBrains IDE |
+| `jetbrains_ides.<name>.cmd` | Binary name (also searches JetBrains Toolbox directories) |
+
+### open_terminal — Terminal Configuration
+
+```json
+"open_terminal": {
+  "terminals": {
+    "Ptyxis": {
+      "enabled": true,
+      "cmd": ["ptyxis", "--new-window", "-d", "{path}"],
+      "flatpak_id": "app.devsuite.Ptyxis",
+      "flatpak_args": ["--new-window", "-d", "{path}"]
+    },
+    "WezTerm": {
+      "enabled": true,
+      "cmd": ["wezterm", "start", "--cwd", "{path}"],
+      "flatpak_id": ""
+    }
+  },
+  "collapse_menu": true
+}
+```
+
+| Key | Description |
+|-----|-------------|
+| `terminals.<name>.enabled` | Enable/disable this terminal |
+| `terminals.<name>.cmd` | Command array. `{path}` is replaced with the target directory at runtime |
+| `terminals.<name>.flatpak_id` | Flatpak app ID as fallback (leave empty to skip flatpak detection) |
+| `terminals.<name>.flatpak_args` | Arguments for flatpak launch (optional, only used when launched via flatpak) |
+| `collapse_menu` | `true`: fold into "Open in Terminal" submenu; `false`: list all directly |
+
+### checksum_algorithms — Checksum Configuration
+
+```json
+"checksum_algorithms": {
+  "enabled": ["md5", "sha1", "sha256", "sha512"]
+}
+```
+
+| Key | Description |
+|-----|-------------|
+| `enabled` | List of hash algorithms to show in the checksum submenu. Supported: `md5`, `sha1`, `sha256`, `sha512` |
+
+## Translation
+
+Uses GNU gettext. Translation files are in `po/`:
+
+```bash
+make xgettext    # Extract translatable strings from source
+make msgmerge    # Update .po files from .pot template
+make msgfmt      # Compile .po to .mo binary
+make i18n        # Full pipeline: extract → merge → compile
+```
 
 ## Supported Languages
 
-- English
-- Chinese
+- English (`en`)
+- Chinese Simplified (`zh_CN`)
 
 ## References
 
 - [nautilus-copy-path](https://github.com/chr314/nautilus-copy-path)
-- [nautilus-open-in-code](https://github.com/GustavoWidman/nautilus-open-in-ptyxis/blob/open-in-code/nautilus-open-in-code.py)
+- [nautilus-open-in-ptyxis](github.com/GustavoWidman/nautilus-open-in-ptyxis)
+- [wezterm](https://github.com/wez/wezterm)
 - [python-nautilus](https://github.com/GNOME/python-nautilus)
 
 ## License
