@@ -156,49 +156,91 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
     def _create_copy_items(self, files: list[Nautilus.FileInfo], group,
                            ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
-        items = []
         if not ops.get("copy", True):
-            return items
+            return []
 
         plural = len(files) > 1
         copy_cfg = self.config.get("copy", {})
-        copy_items = copy_cfg.get("item", {})
+        copy_items_cfg = copy_cfg.get("item", {})
 
-        if copy_items.get("copy_path", {}).get("enabled", True):
-            item = Nautilus.MenuItem(
-                name="NautilusFileMenu::CopyPath" + group,
-                label=Translation.t("copy_paths" if plural else "copy_path"),
-            )
-            item.connect("activate", self.copy_ops.copy_paths, files)
-            items.append(item)
+        # Build list of (name, label, callback, data) for enabled items
+        entries = []
 
-        if copy_items.get("copy_uri", {}).get("enabled", True):
-            item = Nautilus.MenuItem(
-                name="NautilusFileMenu::CopyUri" + group,
-                label=Translation.t("copy_uris" if plural else "copy_uri"),
-            )
-            item.connect("activate", self.copy_ops.copy_uris, files)
-            items.append(item)
+        if copy_items_cfg.get("copy_path", {}).get("enabled", True):
+            entries.append((
+                "CopyPath",
+                Translation.t("copy_paths" if plural else "copy_path"),
+                self.copy_ops.copy_paths,
+                files,
+            ))
 
-        if copy_items.get("copy_name", {}).get("enabled", True):
-            item = Nautilus.MenuItem(
-                name="NautilusFileMenu::CopyName" + group,
-                label=Translation.t("copy_names" if plural else "copy_name"),
-            )
-            item.connect("activate", self.copy_ops.copy_names, files)
-            items.append(item)
+        if copy_items_cfg.get("copy_uri", {}).get("enabled", True):
+            entries.append((
+                "CopyUri",
+                Translation.t("copy_uris" if plural else "copy_uri"),
+                self.copy_ops.copy_uris,
+                files,
+            ))
 
-        if copy_items.get("copy_content", {}).get("enabled", True):
+        if copy_items_cfg.get("copy_name", {}).get("enabled", True):
+            entries.append((
+                "CopyName",
+                Translation.t("copy_names" if plural else "copy_name"),
+                self.copy_ops.copy_names,
+                files,
+            ))
+
+        if copy_items_cfg.get("copy_content", {}).get("enabled", True):
             allow_copy_content = ["application/x-shellscript", "application/json"]
             if len(files) == 1 and (
                     files[0].get_mime_type() in allow_copy_content or files[0].get_mime_type().startswith("text/")):
-                item = Nautilus.MenuItem(
-                    name="NautilusFileMenu::CopyContent" + group,
-                    label=Translation.t("copy_content"),
-                )
-                item.connect("activate", self.copy_ops.copy_content, files[0])
-                items.append(item)
+                entries.append((
+                    "CopyContent",
+                    Translation.t("copy_content"),
+                    self.copy_ops.copy_content,
+                    files[0],
+                ))
 
+        if not entries:
+            return []
+
+        # Single item: no submenu needed
+        if len(entries) == 1:
+            name, label, callback, data = entries[0]
+            item = Nautilus.MenuItem(
+                name=f"NautilusFileMenu::{name}{group}",
+                label=label,
+            )
+            item.connect("activate", callback, data)
+            return [item]
+
+        # collapse_menu=true: fold into submenu
+        if copy_cfg.get("collapse_menu", True):
+            submenu = Nautilus.Menu()
+            for name, label, callback, data in entries:
+                sub_item = Nautilus.MenuItem(
+                    name=f"NautilusFileMenu::{name}{group}",
+                    label=label,
+                )
+                sub_item.connect("activate", callback, data)
+                submenu.append_item(sub_item)
+
+            menu_item = Nautilus.MenuItem(
+                name="NautilusFileMenu::CopyMore" + group,
+                label=Translation.t("copy_more"),
+            )
+            menu_item.set_submenu(submenu)
+            return [menu_item]
+
+        # collapse_menu=false: list all items directly
+        items = []
+        for name, label, callback, data in entries:
+            item = Nautilus.MenuItem(
+                name=f"NautilusFileMenu::{name}{group}",
+                label=label,
+            )
+            item.connect("activate", callback, data)
+            items.append(item)
         return items
 
     # --- Folder operations ---
@@ -262,39 +304,55 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             submenu.append_item(sub_item)
 
         if jb_ides:
-            jb_cfg = self.config.get("open_ide", {}).get("jetbrains_ides", {})
-            if jb_cfg.get("collapse_menu", True):
-                jb_submenu = Nautilus.Menu()
-                for jb_label, jb_cmd in jb_ides:
-                    jb_item = Nautilus.MenuItem(
-                        name="NautilusFileMenu::OpenIDE_JB_" + jb_cmd + group,
-                        label=jb_label,
-                    )
-                    jb_item.connect(
-                        "activate",
-                        lambda m, f, c=jb_cmd: self.ide_ops.open_with_ide(m, f, c),
-                        files,
-                    )
-                    jb_submenu.append_item(jb_item)
-
-                jb_menu_item = Nautilus.MenuItem(
-                    name="NautilusFileMenu::OpenIDE_JetBrains" + group,
-                    label=Translation.t("open_with_jetbrains"),
+            if len(jb_ides) == 1:
+                # Single JetBrains IDE: show directly, no submenu
+                jb_label, jb_cmd = jb_ides[0]
+                jb_item = Nautilus.MenuItem(
+                    name="NautilusFileMenu::OpenIDE_JB_" + jb_cmd + group,
+                    label=jb_label,
                 )
-                jb_menu_item.set_submenu(jb_submenu)
-                submenu.append_item(jb_menu_item)
+                jb_item.connect(
+                    "activate",
+                    lambda m, f, c=jb_cmd: self.ide_ops.open_with_ide(m, f, c),
+                    files,
+                )
+                submenu.append_item(jb_item)
             else:
-                for jb_label, jb_cmd in jb_ides:
-                    jb_item = Nautilus.MenuItem(
-                        name="NautilusFileMenu::OpenIDE_JB_" + jb_cmd + group,
-                        label=jb_label,
+                jb_cfg = self.config.get("open_ide", {}).get("jetbrains_ides", {})
+                if jb_cfg.get("collapse_menu", True):
+                    # Multiple + collapse: fold into "JetBrains" submenu
+                    jb_submenu = Nautilus.Menu()
+                    for jb_label, jb_cmd in jb_ides:
+                        jb_item = Nautilus.MenuItem(
+                            name="NautilusFileMenu::OpenIDE_JB_" + jb_cmd + group,
+                            label=jb_label,
+                        )
+                        jb_item.connect(
+                            "activate",
+                            lambda m, f, c=jb_cmd: self.ide_ops.open_with_ide(m, f, c),
+                            files,
+                        )
+                        jb_submenu.append_item(jb_item)
+
+                    jb_menu_item = Nautilus.MenuItem(
+                        name="NautilusFileMenu::OpenIDE_JetBrains" + group,
+                        label=Translation.t("open_with_jetbrains"),
                     )
-                    jb_item.connect(
-                        "activate",
-                        lambda m, f, c=jb_cmd: self.ide_ops.open_with_ide(m, f, c),
-                        files,
-                    )
-                    submenu.append_item(jb_item)
+                    jb_menu_item.set_submenu(jb_submenu)
+                    submenu.append_item(jb_menu_item)
+                else:
+                    # Multiple + no collapse: list all directly
+                    for jb_label, jb_cmd in jb_ides:
+                        jb_item = Nautilus.MenuItem(
+                            name="NautilusFileMenu::OpenIDE_JB_" + jb_cmd + group,
+                            label=jb_label,
+                        )
+                        jb_item.connect(
+                            "activate",
+                            lambda m, f, c=jb_cmd: self.ide_ops.open_with_ide(m, f, c),
+                            files,
+                        )
+                        submenu.append_item(jb_item)
 
         menu_item = Nautilus.MenuItem(
             name="NautilusFileMenu::OpenIDE" + group,

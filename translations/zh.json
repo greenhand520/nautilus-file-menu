@@ -6,6 +6,7 @@
   "copy_uri": "复制URI",
   "copy_uris": "复制各个URI",
   "copy_content": "复制文本内容",
+  "copy_more": "复制更多",
   "dissolve_folder": "解散文件夹",
   "move_into_folder": "收进文件夹",
   "open_with_ide": "用 {ide} 打开",

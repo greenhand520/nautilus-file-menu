@@ -21,7 +21,7 @@
         "shortcut": "<Ctrl><Shift>C"
       },
       "copy_uri": {
-        "enabled": true,
+        "enabled": false,
         "shortcut": "<Ctrl><Shift>U"
       },
       "copy_name": {
@@ -30,7 +30,7 @@
         "ignore_extension": false
       },
       "copy_content": {
-        "enabled": true,
+        "enabled": false,
         "shortcut": "<Ctrl><Shift>G"
       }
     },
