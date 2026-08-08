@@ -43,6 +43,12 @@ A feature-rich right-click context menu extension for Nautilus (GNOME Files).
 - Parses the `Exec` field and runs the program
 - Supports `Terminal=true` entries (auto-finds terminal emulator)
 
+### Admin Operations
+- **Open as Administrator** — Open folder in Nautilus with admin privileges (uses `admin://` URI)
+- **Edit as Administrator** — Open file in default text editor with admin privileges
+- Only shown for local files, single selection, non-root user
+- "Edit as Administrator" checks MIME type (excludes binary/media files, same as IDE)
+
 ### Checksum
 - Supported algorithms: MD5, SHA1, SHA256, SHA512 (configurable)
 - Results automatically copied to clipboard
@@ -71,6 +77,22 @@ make install
 nautilus -q  # Restart Nautilus
 ```
 
+### Customization
+
+Edit `config.json` to customize the extension's behavior. The file is located at:
+
+```
+~/.local/share/nautilus-python/extensions/nautilus-file-menu/config.json
+```
+
+After editing, restart Nautilus to apply changes:
+
+```bash
+nautilus -q
+```
+
+See the [Configuration](#configuration) section above for all available options.
+
 ### Uninstall
 
 ```bash
@@ -96,14 +118,15 @@ Toggle which features appear in the context menu:
 
 ```json
 "ops_enabled": {
-    "copy": true,
-    "dissolve_folder": true,
-    "move_into_folder": true,
-    "open_ide": true,
-    "open_terminal": true,
-    "appimage": true,
-    "launch_desktop": true,
-    "checksum": true
+  "appimage": true,
+  "launch_desktop": true,
+  "dissolve_folder": true,
+  "move_into_folder": true,
+  "admin": true,
+  "copy": true,
+  "open_ide": true,
+  "open_terminal": true,
+  "checksum": true
 }
 ```
 
@@ -229,22 +252,7 @@ make i18n        # Full pipeline: extract → merge → compile
 - [nautilus-open-in-ptyxis](github.com/GustavoWidman/nautilus-open-in-ptyxis)
 - [wezterm](https://github.com/wez/wezterm)
 - [python-nautilus](https://github.com/GNOME/python-nautilus)
-
-## Customization
-
-Edit `config.json` to customize the extension's behavior. The file is located at:
-
-```
-~/.local/share/nautilus-python/extensions/nautilus-file-menu/config.json
-```
-
-After editing, restart Nautilus to apply changes:
-
-```bash
-nautilus -q
-```
-
-See the [Configuration](#configuration) section above for all available options.
+- [nautilus-admin-gtk4](github.com/MacTavishAO/nautilus-admin-gtk4)
 
 ## License
 

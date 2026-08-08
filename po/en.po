@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-file-menu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 22:58+0800\n"
+"POT-Creation-Date: 2026-08-09 00:38+0800\n"
 "PO-Revision-Date: 2026-08-08\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -15,92 +15,108 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: nautilus_file_menu.py:192
+#: nautilus_file_menu.py:197
 msgid "copy_paths"
 msgstr "Copy paths"
 
-#: nautilus_file_menu.py:192
+#: nautilus_file_menu.py:197
 msgid "copy_path"
 msgstr "Copy path"
 
-#: nautilus_file_menu.py:196
+#: nautilus_file_menu.py:201
 msgid "copy_uris"
 msgstr "Copy URIs"
 
-#: nautilus_file_menu.py:196
+#: nautilus_file_menu.py:201
 msgid "copy_uri"
 msgstr "Copy URI"
 
-#: nautilus_file_menu.py:200
+#: nautilus_file_menu.py:205
 msgid "copy_names"
 msgstr "Copy names"
 
-#: nautilus_file_menu.py:200
+#: nautilus_file_menu.py:205
 msgid "copy_name"
 msgstr "Copy name"
 
-#: nautilus_file_menu.py:208
+#: nautilus_file_menu.py:213
 msgid "copy_content"
 msgstr "Copy content"
 
-#: nautilus_file_menu.py:239
+#: nautilus_file_menu.py:244
 msgid "copy_more"
 msgstr "Copy more"
 
-#: nautilus_file_menu.py:270 modules/folder_ops.py:48
+#: nautilus_file_menu.py:275 modules/folder_ops.py:48
 msgid "dissolve_folder"
 msgstr "Dissolve folder"
 
-#: nautilus_file_menu.py:278
+#: nautilus_file_menu.py:283
 msgid "move_into_folder"
 msgstr "Move into folder"
 
-#: nautilus_file_menu.py:310
+#: nautilus_file_menu.py:315
 msgid "open_with_ide"
 msgstr "Open with %(ide)s"
 
-#: nautilus_file_menu.py:366
+#: nautilus_file_menu.py:371
 msgid "open_with_jetbrains"
 msgstr "JetBrains"
 
-#: nautilus_file_menu.py:386
+#: nautilus_file_menu.py:391
 msgid "open_with_ide_submenu"
 msgstr "Open with IDE"
 
-#: nautilus_file_menu.py:414 nautilus_file_menu.py:427
-#: nautilus_file_menu.py:446
+#: nautilus_file_menu.py:419 nautilus_file_menu.py:432
+#: nautilus_file_menu.py:451
 msgid "open_in_terminal"
 msgstr "Open in %(name)s"
 
-#: nautilus_file_menu.py:438
+#: nautilus_file_menu.py:443
 msgid "open_in_terminal_submenu"
 msgstr "Open in terminal"
 
-#: nautilus_file_menu.py:474
+#: nautilus_file_menu.py:476
 msgid "extract_appimage"
 msgstr "Extract AppImage"
 
-#: nautilus_file_menu.py:496
+#: nautilus_file_menu.py:498
 msgid "launch_desktop"
 msgstr "Launch Program"
 
-#: nautilus_file_menu.py:522
+#: nautilus_file_menu.py:532
+msgid "open_as_admin"
+msgstr "Open as Administrator"
+
+#: nautilus_file_menu.py:541
+msgid "edit_as_admin"
+msgstr "Edit as Administrator"
+
+#: nautilus_file_menu.py:569
 msgid "checksum"
 msgstr "Checksum (%(algo)s)"
 
-#: nautilus_file_menu.py:546
+#: nautilus_file_menu.py:593
 msgid "checksum_submenu"
 msgstr "Checksum"
 
-#: modules/appimage_ops.py:60 modules/appimage_ops.py:65
+#: modules/admin_ops.py:59
+msgid "notify_admin_done"
+msgstr "Admin Operation"
+
+#: modules/admin_ops.py:60
+msgid "notify_no_editor"
+msgstr "No text editor found"
+
+#: modules/appimage_ops.py:70 modules/appimage_ops.py:75
 msgid "notify_appimage_extract_done"
 msgstr "AppImage extraction completed"
 
-#: modules/appimage_ops.py:61
+#: modules/appimage_ops.py:71
 msgid "notify_appimage_extract_count"
 msgstr "Successfully extracted %(count)s file(s)"
 
-#: modules/appimage_ops.py:66
+#: modules/appimage_ops.py:76
 msgid "notify_appimage_extract_failed"
 msgstr "No files were extracted"
 
@@ -148,16 +164,17 @@ msgstr "New folder"
 msgid "dialog_create"
 msgstr "Create"
 
-#: modules/launch_ops.py:87
+#: modules/launch_ops.py:106 modules/launch_ops.py:123
 msgid "notify_launch_done"
 msgstr "Program launch completed"
 
-#: modules/launch_ops.py:88
-msgid "notify_launch_count"
-msgstr "Successfully launched %(count)s program(s)"
-
+#: modules/launch_ops.py:107
 msgid "notify_no_terminal"
 msgstr "No terminal emulator found, cannot launch this program"
+
+#: modules/launch_ops.py:124
+msgid "notify_launch_count"
+msgstr "Successfully launched %(count)s program(s)"
 
 #~ msgid "dialog_ok"
 #~ msgstr "OK"

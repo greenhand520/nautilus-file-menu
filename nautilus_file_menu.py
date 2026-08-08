@@ -13,6 +13,7 @@ from modules.ide_ops import IdeOps, is_file_openable_in_ide
 from modules.terminal_ops import TerminalOps
 from modules.appimage_ops import AppImageOps, is_appimage
 from modules.launch_ops import LaunchOps
+from modules.admin_ops import AdminOps, _is_openable_in_editor
 from modules.notify import set_log_level, logger
 import translation
 
@@ -53,6 +54,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 "open_terminal": True,
                 "appimage": True,
                 "launch_desktop": True,
+                "admin": True,
                 "checksum": True,
             },
             "language": "auto",
@@ -104,6 +106,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         self.appimage_ops = AppImageOps()
         self.launch_ops = LaunchOps(self.terminal_ops)
         self.checksum_ops = ChecksumOps(self.config, self.clipboard, self.primary_clipboard)
+        self.admin_ops = AdminOps(self.config)
 
         app = Gtk.Application.get_default()
         if app:
@@ -158,18 +161,20 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         ops = self.config.get("ops_enabled", {})
         items.extend(self._create_ide_items([folder], "Background", ops))
         items.extend(self._create_terminal_items([folder], "Background", ops))
+        items.extend(self._create_admin_items([folder], "Background", ops))
         return items
 
     def _create_menu_items(self, files: list[Nautilus.FileInfo], group) -> list[Nautilus.MenuItem]:
         items = []
         ops = self.config.get("ops_enabled", {})
 
-        items.extend(self._create_copy_items(files, group, ops))
-        items.extend(self._create_folder_items(files, group, ops))
-        items.extend(self._create_ide_items(files, group, ops))
-        items.extend(self._create_terminal_items(files, group, ops))
         items.extend(self._create_appimage_items(files, group, ops))
         items.extend(self._create_launch_items(files, group, ops))
+        items.extend(self._create_folder_items(files, group, ops))
+        items.extend(self._create_admin_items(files, group, ops))
+        items.extend(self._create_copy_items(files, group, ops))
+        items.extend(self._create_ide_items(files, group, ops))
+        items.extend(self._create_terminal_items(files, group, ops))
         items.extend(self._create_checksum_items(files, group, ops))
 
         return items
@@ -494,6 +499,51 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         )
         item.connect("activate", self.launch_ops.launch_desktop_file, files)
         return [item]
+
+    # --- Admin operations ---
+
+    def _create_admin_items(self, files: list[Nautilus.FileInfo], group,
+                            ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
+        if not ops.get("admin", True):
+            return []
+
+        # Don't show when already running as root
+        if os.geteuid() == 0:
+            return []
+
+        # Only for local files
+        if any(f.get_uri_scheme() != "file" for f in files):
+            return []
+
+        # Only single file/folder
+        if len(files) != 1:
+            return []
+
+        f = files[0]
+        is_dir = f.is_directory()
+        path = _uri_to_path(f)
+
+        items = []
+
+        # "Open as Administrator" for directories
+        if is_dir and os.path.isdir(path):
+            item = Nautilus.MenuItem(
+                name="NautilusFileMenu::OpenAsAdmin" + group,
+                label=translation.gettext("open_as_admin"),
+            )
+            item.connect("activate", self.admin_ops.open_as_admin, [f])
+            items.append(item)
+
+        # "Edit as Administrator" for editable files (MIME check)
+        if not is_dir and _is_openable_in_editor(f, self.config):
+            item = Nautilus.MenuItem(
+                name="NautilusFileMenu::EditAsAdmin" + group,
+                label=translation.gettext("edit_as_admin"),
+            )
+            item.connect("activate", self.admin_ops.edit_as_admin, [f])
+            items.append(item)
+
+        return items
 
     # --- Checksum ---
 
