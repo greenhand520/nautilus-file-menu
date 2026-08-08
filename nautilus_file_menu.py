@@ -250,17 +250,19 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                              ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
         items = []
 
-        if (
-                ops.get("dissolve_folder", True)
-                and len(files) == 1
-                and os.path.isdir(_uri_to_path(files[0]))
-        ):
-            item = Nautilus.MenuItem(
-                name="NautilusFileMenu::DissolveFolder" + group,
-                label=translation.gettext("dissolve_folder"),
+        if ops.get("dissolve_folder", True):
+            # At least one selected item must be a real directory (not symlink)
+            has_dir = any(
+                os.path.isdir(_uri_to_path(f)) and not os.path.islink(_uri_to_path(f))
+                for f in files
             )
-            item.connect("activate", self.folder_ops.dissolve_folder, files)
-            items.append(item)
+            if has_dir:
+                item = Nautilus.MenuItem(
+                    name="NautilusFileMenu::DissolveFolder" + group,
+                    label=translation.gettext("dissolve_folder"),
+                )
+                item.connect("activate", self.folder_ops.dissolve_folder, files)
+                items.append(item)
 
         if ops.get("move_into_folder", True) and len(files) >= 2:
             item = Nautilus.MenuItem(

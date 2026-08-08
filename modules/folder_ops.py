@@ -11,7 +11,7 @@ from .file_utils import file_move, file_delete, gio_make_directories
 
 
 def _unique_dst(parent, item_name):
-    """返回父级中唯一的目标路径，如果需要则附加 _N。"""
+    """Return a unique destination path in parent, appending _N if needed."""
     dst = os.path.join(parent, item_name)
     if not os.path.exists(dst):
         return dst
@@ -25,34 +25,93 @@ def _unique_dst(parent, item_name):
 
 class FolderOps:
     def dissolve_folder(self, menu, files):
-        """Move all contents of a folder to its parent, then delete the folder."""
-        if len(files) != 1:
+        """Move all contents of selected folders to their parents, then delete the folders."""
+        folders = []
+        for f in files:
+            path = _uri_to_path(f)
+            if os.path.isdir(path) and not os.path.islink(path):
+                folders.append(path)
+
+        if not folders:
             return
 
-        folder_path = _uri_to_path(files[0])
-        if not os.path.isdir(folder_path):
-            return
+        logger.debug("dissolve_folder: %d folder(s)", len(folders))
 
-        logger.debug("dissolve_folder: %s", folder_path)
+        # Confirmation dialog
+        if len(folders) == 1:
+            msg = translation.gettext("dialog_dissolve_confirm").format(
+                name=os.path.basename(folders[0]))
+        else:
+            msg = translation.gettext("dialog_dissolve_confirm_plural").format(
+                count=len(folders))
 
-        parent_path = os.path.dirname(folder_path)
+        win = Gtk.Window(title=translation.gettext("dissolve_folder"))
+        win.set_default_size(280, 120)
+        win.set_modal(True)
 
-        move_failed = False
-        for item_name in os.listdir(folder_path):
-            src = os.path.join(folder_path, item_name)
-            dst = _unique_dst(parent_path, item_name)
-            if not file_move(src, dst):
-                move_failed = True
-                logger.error("dissolve_folder: failed to move %s -> %s", src, dst)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        box.set_margin_top(20)
+        box.set_margin_bottom(20)
+        box.set_margin_start(20)
+        box.set_margin_end(20)
 
-        # 如果无法移动项目，不删除源目录。
-        # 使得操作的成功/失败状态变得明确而不是依赖 Gio.delete()
-        if move_failed:
-            logger.error("dissolve_folder: source directory was not removed: %s", folder_path)
-            return
+        label = Gtk.Label(label=msg)
+        label.set_wrap(True)
+        box.append(label)
 
-        if not file_delete(folder_path):
-            logger.error("dissolve_folder: failed to remove folder: %s", folder_path)
+        btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        btn_box.set_halign(Gtk.Align.END)
+
+        cancel_btn = Gtk.Button(label=translation.gettext("dialog_cancel"))
+        cancel_btn.connect("clicked", lambda b: win.destroy())
+        btn_box.append(cancel_btn)
+
+        ok_btn = Gtk.Button(label=translation.gettext("dialog_dissolve"))
+        ok_btn.add_css_class("destructive-action")
+        ok_btn.connect("clicked", lambda b: self._do_dissolve(win, folders))
+        btn_box.append(ok_btn)
+
+        box.append(btn_box)
+        win.set_child(box)
+
+        # Enter → confirm, Escape → cancel
+        def _on_key(ctrl, keyval, keycode, state):
+            if keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
+                ok_btn.activate()
+                return True
+            if keyval == Gdk.KEY_Escape:
+                win.destroy()
+                return True
+            return False
+
+        controller = Gtk.EventControllerKey()
+        controller.connect("key-pressed", _on_key)
+        win.add_controller(controller)
+
+        win.present()
+
+    def _do_dissolve(self, win, folders):
+        """Execute dissolve after confirmation."""
+        win.destroy()
+
+        for folder_path in folders:
+            logger.debug("dissolving: %s", folder_path)
+            parent_path = os.path.dirname(folder_path)
+
+            move_failed = False
+            for item_name in os.listdir(folder_path):
+                src = os.path.join(folder_path, item_name)
+                dst = _unique_dst(parent_path, item_name)
+                if not file_move(src, dst):
+                    move_failed = True
+                    logger.error("dissolve_folder: failed to move %s -> %s", src, dst)
+
+            if move_failed:
+                logger.error("dissolve_folder: source directory was not removed: %s", folder_path)
+                continue
+
+            if not file_delete(folder_path):
+                logger.error("dissolve_folder: failed to remove folder: %s", folder_path)
 
     def move_into_folder(self, menu, files):
         """Create a new folder and move all selected files into it."""
@@ -62,7 +121,7 @@ class FolderOps:
         logger.debug("move_into_folder: %d files", len(files))
 
         win = Gtk.Window(title=translation.gettext("dialog_move_into_folder_title"))
-        win.set_default_size(350, 120)
+        win.set_default_size(280, 120)
         win.set_modal(True)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)

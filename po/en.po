@@ -116,6 +116,15 @@ msgstr "Cancel"
 msgid "dialog_create"
 msgstr "Create"
 
+msgid "dialog_dissolve_confirm"
+msgstr "Dissolve folder \"{name}\"?"
+
+msgid "dialog_dissolve_confirm_plural"
+msgstr "Dissolve {count} folders?"
+
+msgid "dialog_dissolve"
+msgstr "Dissolve"
+
 #~ msgid "dialog_ok"
 #~ msgstr "OK"
 

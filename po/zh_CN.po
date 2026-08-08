@@ -116,6 +116,15 @@ msgstr "取消"
 msgid "dialog_create"
 msgstr "创建"
 
+msgid "dialog_dissolve_confirm"
+msgstr "确定要解散「{name}」文件夹吗？"
+
+msgid "dialog_dissolve_confirm_plural"
+msgstr "确定要解散 {count} 个文件夹吗？"
+
+msgid "dialog_dissolve"
+msgstr "解散"
+
 #~ msgid "dialog_ok"
 #~ msgstr "确定"
 
