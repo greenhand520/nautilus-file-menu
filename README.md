@@ -213,6 +213,22 @@ make i18n        # Full pipeline: extract → merge → compile
 - [wezterm](https://github.com/wez/wezterm)
 - [python-nautilus](https://github.com/GNOME/python-nautilus)
 
+## Customization
+
+Edit `config.json` to customize the extension's behavior. The file is located at:
+
+```
+~/.local/share/nautilus-python/extensions/nautilus-file-menu/config.json
+```
+
+After editing, restart Nautilus to apply changes:
+
+```bash
+nautilus -q
+```
+
+See the [Configuration](#configuration) section above for all available options.
+
 ## License
 
 MIT
