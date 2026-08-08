@@ -2,7 +2,7 @@
 
 A feature-rich right-click context menu extension for Nautilus (GNOME Files).
 
-**Note⚠️: Only tested on Gnome 50**
+**Note⚠️: Only tested on Gnome 50** In theory, all Gnome desktops using GTK4 support.
 
 ## Features
 
@@ -21,13 +21,15 @@ A feature-rich right-click context menu extension for Nautilus (GNOME Files).
 
 ### Open with IDE
 - Auto-detects installed IDEs (binary → desktop file → flatpak)
-- Supports VSCode, Code-OSS, Zed, and all JetBrains IDEs
+- Built-in support for VSCode, Code-OSS, Zed, and all JetBrains IDEs
+- **Add your own IDEs** by editing `open_ide` in `config.json`
 - Single IDE shows directly, multiple IDEs in submenu
 - Also available when right-clicking folder background
 
 ### Open in Terminal
 - Auto-detects installed terminals (native binary → flatpak)
-- Supports Ptyxis, Ghostty, Kitty, Alacritty, WezTerm
+- Built-in support for Ptyxis, Ghostty, Kitty, Alacritty, WezTerm, Console
+- **Add your own terminals** by editing `open_terminal` in `config.json`
 - Per-terminal command configuration with `{path}` placeholder
 - Single terminal shows directly, multiple terminals in submenu
 - Only appears when right-clicking a directory or folder background
@@ -129,13 +131,13 @@ Toggle which features appear in the context menu:
   "other_ides": {
     "Visual Studio Code": {
       "enabled": true,
-      "cmd": "code",
-      "flatpak_id": "com.visualstudio.code"
+      "cmd": ["code"],
+      "flatpak": ["com.visualstudio.code"]
     }
   },
   "jetbrains_ides": {
     "collapse_menu": false,
-    "PyCharm": { "enabled": true, "cmd": "pycharm" }
+    "PyCharm": { "enabled": true, "cmd": ["pycharm"], "flatpak": ["com.jetbrains.PyCharm-Professional"] }
   }
 }
 ```
@@ -143,11 +145,14 @@ Toggle which features appear in the context menu:
 | Key | Description |
 |-----|-------------|
 | `other_ides.<name>.enabled` | Enable/disable this IDE |
-| `other_ides.<name>.cmd` | Binary name (searched in PATH, `~/.local/bin`, `/usr/local/bin`) |
-| `other_ides.<name>.flatpak_id` | Flatpak app ID as fallback when native binary is not found |
+| `other_ides.<name>.cmd` | Command array. First element is the binary name (searched in PATH, `~/.local/bin`, `/usr/local/bin`) |
+| `other_ides.<name>.flatpak` | Flatpak fallback: first element is app ID, rest are args. Empty array to skip |
 | `jetbrains_ides.collapse_menu` | `true`: fold JetBrains into submenu; `false`: list directly in IDE menu |
 | `jetbrains_ides.<name>.enabled` | Enable/disable this JetBrains IDE |
-| `jetbrains_ides.<name>.cmd` | Binary name (also searches JetBrains Toolbox directories) |
+| `jetbrains_ides.<name>.cmd` | Command array. First element is the binary name (also searches JetBrains Toolbox dirs) |
+| `jetbrains_ides.<name>.flatpak` | Flatpak fallback: first element is app ID, rest are args. Empty array to skip |
+
+> **Tip**: To add a new IDE, add an entry to `other_ides` or `jetbrains_ides` with the binary name in `cmd` and optionally a Flatpak app ID in `flatpak`. The first element of `cmd` is used for detection. You can find app’s Flatpak ID on the [flathub](https://flathub.org) website.
 
 ### open_terminal — Terminal Configuration
 
@@ -157,13 +162,12 @@ Toggle which features appear in the context menu:
     "Ptyxis": {
       "enabled": true,
       "cmd": ["ptyxis", "--new-window", "-d", "{path}"],
-      "flatpak_id": "app.devsuite.Ptyxis",
-      "flatpak_args": ["--new-window", "-d", "{path}"]
+      "flatpak": ["app.devsuite.Ptyxis", "--new-window", "-d", "{path}"]
     },
     "WezTerm": {
       "enabled": true,
       "cmd": ["wezterm", "start", "--cwd", "{path}"],
-      "flatpak_id": ""
+      "flatpak": ["org.wezfurlong.wezterm", "start", "--cwd", "{path}"]
     }
   },
   "collapse_menu": true
@@ -174,9 +178,10 @@ Toggle which features appear in the context menu:
 |-----|-------------|
 | `terminals.<name>.enabled` | Enable/disable this terminal |
 | `terminals.<name>.cmd` | Command array. `{path}` is replaced with the target directory at runtime |
-| `terminals.<name>.flatpak_id` | Flatpak app ID as fallback (leave empty to skip flatpak detection) |
-| `terminals.<name>.flatpak_args` | Arguments for flatpak launch (optional, only used when launched via flatpak) |
+| `terminals.<name>.flatpak` | Flatpak fallback: first element is app ID, rest are args. Empty array to skip |
 | `collapse_menu` | `true`: fold into "Open in Terminal" submenu; `false`: list all directly |
+
+> **Tip**: To add a new terminal, add an entry to `terminals` with the command in `cmd` (use `{path}` for the working directory) and optionally a Flatpak app ID in `flatpak`.
 
 ### checksum_algorithms — Checksum Configuration
 

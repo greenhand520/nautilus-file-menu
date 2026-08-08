@@ -42,66 +42,76 @@
     "other_ides": {
       "Visual Studio Code": {
         "enabled": true,
-        "cmd": "code",
-        "flatpak_id": "com.visualstudio.code"
+        "cmd": ["code"],
+        "flatpak": ["com.visualstudio.code"]
       },
       "Visual Studio Code - Insiders": {
         "enabled": true,
-        "cmd": "code-insiders",
-        "flatpak_id": "com.visualstudio.code.insiders"
+        "cmd": ["code-insiders"],
+        "flatpak": ["com.visualstudio.code.insiders"]
       },
       "Code - OSS": {
         "enabled": true,
-        "cmd": "code-oss",
-        "flatpak_id": "com.visualstudio.code-oss"
+        "cmd": ["code-oss"],
+        "flatpak": []
       },
       "Zed": {
         "enabled": true,
-        "cmd": "zed",
-        "flatpak_id": "dev.zed.Zed"
+        "cmd": ["zed"],
+        "flatpak": ["dev.zed.Zed"]
       }
     },
     "jetbrains_ides": {
       "collapse_menu": false,
       "IntelliJ IDEA": {
         "enabled": true,
-        "cmd": "idea"
+        "cmd": ["idea"],
+        "flatpak": ["com.jetbrains.IntelliJ-IDEA-Ultimate"]
       },
       "PyCharm": {
         "enabled": true,
-        "cmd": "pycharm"
+        "cmd": ["pycharm"],
+        "flatpak": ["com.jetbrains.PyCharm-Professional"]
       },
       "WebStorm": {
         "enabled": true,
-        "cmd": "webstorm"
+        "cmd": ["webstorm"],
+        "flatpak": ["com.jetbrains.WebStorm"]
       },
       "CLion": {
         "enabled": true,
-        "cmd": "clion"
+        "cmd": ["clion"],
+        "flatpak": ["com.jetbrains.CLion"]
       },
       "GoLand": {
         "enabled": true,
-        "cmd": "goland"
+        "cmd": ["goland"],
+        "flatpak": ["com.jetbrains.GoLand"]
       },
       "Rider": {
         "enabled": true,
-        "cmd": "rider"
+        "cmd": ["rider"],
+        "flatpak": ["com.jetbrains.Rider"]
       },
       "RubyMine": {
         "enabled": true,
-        "cmd": "rubymine"
+          "cmd": ["rubymine"],
+        "flatpak": []
       },
       "PhpStorm": {
         "enabled": true,
-        "cmd": "phpstorm"
+        "cmd": ["phpstorm"],
+        "flatpak": ["com.jetbrains.PhpStorm"]
       },
       "DataGrip": {
         "enabled": true,
-        "cmd": "datagrip"
+        "cmd": ["datagrip"],
+        "flatpak": []
       },
       "RustRover": {
         "enabled": true,
-        "cmd": "rustrover"
+        "cmd": ["rustrover"],
+        "flatpak": ["com.jetbrains.RustRover"]
       }
     }
   },
@@ -110,38 +120,37 @@
       "Ptyxis": {
         "enabled": true,
         "cmd": ["ptyxis", "--new-window", "-d", "{path}"],
-        "flatpak_id": "app.devsuite.Ptyxis",
-        "flatpak_args": ["--new-window", "-d", "{path}"]
+        "flatpak": ["app.devsuite.Ptyxis", "--new-window", "-d", "{path}"]
       },
       "Ghostty": {
         "enabled": true,
         "cmd": ["ghostty", "--working-directory={path}", "--gtk-single-instance=false"],
-        "flatpak_id": ""
+        "flatpak": []
       },
       "Kitty": {
         "enabled": true,
-        "cmd": ["kitty", "--directory", "{path}"],
-        "flatpak_id": ""
+        "cmd": ["kitty", "{path}"],
+        "flatpak": []
       },
       "Alacritty": {
         "enabled": true,
         "cmd": ["alacritty", "--working-directory", "{path}"],
-        "flatpak_id": ""
+        "flatpak": []
       },
       "WezTerm": {
         "enabled": true,
         "cmd": ["wezterm", "start", "--cwd", "{path}"],
-        "flatpak_id": ""
+        "flatpak": ["org.wezfurlong.wezterm", "start", "--cwd", "{path}"]
+      },
+      "Console": {
+        "enabled": true,
+        "cmd": ["kgx", "{path}"],
+        "flatpak": []
       }
     },
     "collapse_menu": true
   },
   "checksum_algorithms": {
-    "enabled": [
-      "md5",
-      "sha1",
-      "sha256",
-      "sha512"
-    ]
+    "enabled": ["md5", "sha1", "sha256", "sha512"]
   }
 }

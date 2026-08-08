@@ -18,14 +18,11 @@ class TerminalOps:
                 if not isinstance(cfg, dict) or not cfg.get("enabled", True):
                     continue
 
-                cmd = cfg.get("cmd", "")
-                if not cmd:
+                cmd = cfg.get("cmd", [])
+                if not cmd or not isinstance(cmd, list):
                     continue
 
-                flatpak_id = cfg.get("flatpak_id", "")
-
-                # Extract binary name for detection (first element if array)
-                cmd_name = cmd[0] if isinstance(cmd, list) else cmd
+                cmd_name = cmd[0]
 
                 # Phase 1: native binary
                 found = find_binary(cmd_name)
@@ -35,13 +32,15 @@ class TerminalOps:
                     continue
 
                 # Phase 2: flatpak
-                if flatpak_id and is_flatpak_installed(flatpak_id):
-                    cfg_copy = dict(cfg)
-                    cfg_copy["_flatpak"] = True
-                    self.available_terminals.append((name, cfg_copy))
-                    logger.info("Terminal detected (flatpak): %s → %s", name, flatpak_id)
+                flatpak = cfg.get("flatpak", [])
+                if flatpak and isinstance(flatpak, list) and flatpak[0]:
+                    if is_flatpak_installed(flatpak[0]):
+                        cfg_copy = dict(cfg)
+                        cfg_copy["_flatpak"] = True
+                        self.available_terminals.append((name, cfg_copy))
+                        logger.info("Terminal detected (flatpak): %s → %s", name, flatpak[0])
         except Exception as e:
-            logger.exception("Failed to detect open terminal cfg, cause: %s", e)
+            logger.exception("Failed to detect terminal cfg: %s", e)
 
     def open_terminal(self, menu, files, cfg):
         """Open terminal in the given directory."""
@@ -62,17 +61,13 @@ class TerminalOps:
 
         # Build command with path substitution
         if cfg.get("_flatpak"):
-            flatpak_id = cfg.get("flatpak_id", "")
-            flatpak_args = cfg.get("flatpak_args", [])
-            args = ["flatpak", "run", flatpak_id]
-            for a in flatpak_args:
-                args.append(a.replace("{path}", target))
+            flatpak = cfg.get("flatpak", [])
+            args = ["flatpak", "run"] + [a.replace("{path}", target) for a in flatpak]
         else:
             cmd = cfg.get("cmd", [])
-            if isinstance(cmd, list):
-                args = [a.replace("{path}", target) for a in cmd]
-            else:
-                args = [cmd]
+            args = [a.replace("{path}", target) for a in cmd]
+
+        logger.debug("Terminal command: %s", args)
 
         try:
             subprocess.Popen(
@@ -81,7 +76,7 @@ class TerminalOps:
                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             )
         except Exception as e:
-            logger.exception("Failed to open terminal: %s, cause: %s", args, e)
+            logger.exception("Failed to open terminal: %s", e)
 
     def get_terminals(self):
         """Return list of (display_name, cfg) for available terminals."""
