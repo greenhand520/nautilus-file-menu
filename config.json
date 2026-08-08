@@ -21,7 +21,7 @@
         "shortcut": "<Ctrl><Shift>C"
       },
       "copy_uri": {
-        "enabled": false,
+        "enabled": true,
         "shortcut": "<Ctrl><Shift>U"
       },
       "copy_name": {
@@ -30,7 +30,7 @@
         "ignore_extension": false
       },
       "copy_content": {
-        "enabled": false,
+        "enabled": true,
         "shortcut": "<Ctrl><Shift>G"
       }
     },
@@ -62,7 +62,7 @@
       }
     },
     "jetbrains_ides": {
-      "collapse_menu": true,
+      "collapse_menu": false,
       "IntelliJ IDEA": {
         "enabled": true,
         "cmd": "idea"
@@ -109,27 +109,28 @@
     "terminals": {
       "Ptyxis": {
         "enabled": true,
-        "cmd": "ptyxis",
-        "flatpak_id": "app.devsuite.Ptyxis"
+        "cmd": ["ptyxis", "--new-window", "-d", "{path}"],
+        "flatpak_id": "app.devsuite.Ptyxis",
+        "flatpak_args": ["--new-window", "-d", "{path}"]
       },
       "Ghostty": {
         "enabled": true,
-        "cmd": "ghostty",
+        "cmd": ["ghostty", "--working-directory={path}", "--gtk-single-instance=false"],
         "flatpak_id": ""
       },
       "Kitty": {
         "enabled": true,
-        "cmd": "kitty",
+        "cmd": ["kitty", "--directory", "{path}"],
         "flatpak_id": ""
       },
       "Alacritty": {
         "enabled": true,
-        "cmd": "alacritty",
+        "cmd": ["alacritty", "--working-directory", "{path}"],
         "flatpak_id": ""
       },
       "WezTerm": {
         "enabled": true,
-        "cmd": "wezterm",
+        "cmd": ["wezterm", "start", "--cwd", "{path}"],
         "flatpak_id": ""
       }
     },

@@ -4,7 +4,7 @@ from gi import require_version
 
 require_version('Gtk', '4.0')
 from gi.repository import Gtk, Gdk
-from translation import Translation
+import translation
 from .file_utils import uri_to_path as _uri_to_path
 from .notify import logger
 from .file_utils import file_move, file_delete, gio_make_directories
@@ -57,7 +57,7 @@ class FolderOps:
         if len(files) < 2:
             return
 
-        win = Gtk.Window(title=Translation.t("dialog_move_into_folder_title"))
+        win = Gtk.Window(title=translation.gettext("dialog_move_into_folder_title"))
         win.set_default_size(350, 120)
         win.set_modal(True)
 
@@ -67,21 +67,21 @@ class FolderOps:
         box.set_margin_start(20)
         box.set_margin_end(20)
 
-        label = Gtk.Label(label=Translation.t("dialog_folder_name_label"))
+        label = Gtk.Label(label=translation.gettext("dialog_folder_name_label"))
         box.append(label)
 
         entry = Gtk.Entry()
-        entry.set_text(Translation.t("dialog_default_folder_name"))
+        entry.set_text(translation.gettext("dialog_default_folder_name"))
         box.append(entry)
 
         btn_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         btn_box.set_halign(Gtk.Align.END)
 
-        cancel_btn = Gtk.Button(label=Translation.t("dialog_cancel"))
+        cancel_btn = Gtk.Button(label=translation.gettext("dialog_cancel"))
         cancel_btn.connect("clicked", lambda b: win.destroy())
         btn_box.append(cancel_btn)
 
-        ok_btn = Gtk.Button(label=Translation.t("dialog_create"))
+        ok_btn = Gtk.Button(label=translation.gettext("dialog_create"))
         ok_btn.add_css_class("suggested-action")
         ok_btn.connect("clicked", lambda b: self._do_move_into_folder(win, entry.get_text(), files))
         btn_box.append(ok_btn)

@@ -1,0 +1,122 @@
+# Chinese (Simplified) translation for nautilus-file-menu
+# Copyright (C) 2026
+# This file is distributed under the same license as the nautilus-file-menu package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nautilus-file-menu\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-08 19:26+0800\n"
+"PO-Revision-Date: 2026-08-08\n"
+"Last-Translator: \n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: nautilus_file_menu.py:177
+msgid "copy_paths"
+msgstr "复制各个路径"
+
+#: nautilus_file_menu.py:177
+msgid "copy_path"
+msgstr "复制路径"
+
+#: nautilus_file_menu.py:181
+msgid "copy_uris"
+msgstr "复制各个 URI"
+
+#: nautilus_file_menu.py:181
+msgid "copy_uri"
+msgstr "复制URI"
+
+#: nautilus_file_menu.py:185
+msgid "copy_names"
+msgstr "复制各个文件名"
+
+#: nautilus_file_menu.py:185
+msgid "copy_name"
+msgstr "复制文件名"
+
+#: nautilus_file_menu.py:194
+msgid "copy_content"
+msgstr "复制文本内容"
+
+#: nautilus_file_menu.py:225
+msgid "copy_more"
+msgstr "复制更多"
+
+#: nautilus_file_menu.py:254
+msgid "dissolve_folder"
+msgstr "解散文件夹"
+
+#: nautilus_file_menu.py:262
+msgid "move_into_folder"
+msgstr "收进文件夹"
+
+#: nautilus_file_menu.py:334
+msgid "open_with_jetbrains"
+msgstr "JetBrains"
+
+#: nautilus_file_menu.py:354
+msgid "open_with_ide_submenu"
+msgstr "用 IDE 打开"
+
+#: nautilus_file_menu.py:382 nautilus_file_menu.py:395
+#: nautilus_file_menu.py:414
+msgid "open_in_terminal"
+msgstr "在 %(name)s 中打开"
+
+#: nautilus_file_menu.py:406
+msgid "open_in_terminal_submenu"
+msgstr "在终端中打开"
+
+#: nautilus_file_menu.py:446
+msgid "checksum"
+msgstr "校验和 (%(algo)s)"
+
+#: nautilus_file_menu.py:470
+msgid "checksum_submenu"
+msgstr "校验和"
+
+#: modules/checksum_ops.py:93
+msgid "notify_file_checksum_ok"
+msgstr "%s 已复制到剪贴板"
+
+#: modules/checksum_ops.py:95
+msgid "notify_files_checksum_ok"
+msgstr "%s个文件的%s已复制到剪贴板"
+
+#: modules/copy_ops.py:47
+msgid "notify_file_contents_copied"
+msgstr "文件 %s 内容已复制到剪贴板"
+
+#: modules/folder_ops.py:60
+msgid "dialog_move_into_folder_title"
+msgstr "收进文件夹"
+
+#: modules/folder_ops.py:70
+msgid "dialog_folder_name_label"
+msgstr "请输入文件夹名称："
+
+#: modules/folder_ops.py:74
+msgid "dialog_default_folder_name"
+msgstr "新文件夹"
+
+#: modules/folder_ops.py:80
+msgid "dialog_cancel"
+msgstr "取消"
+
+#: modules/folder_ops.py:84
+msgid "dialog_create"
+msgstr "创建"
+
+#~ msgid "open_with_ide"
+#~ msgstr "用 %(ide)s 打开"
+
+#~ msgid "dialog_ok"
+#~ msgstr "确定"
+
+#~ msgid "dialog_continue"
+#~ msgstr "继续"

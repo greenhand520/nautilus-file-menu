@@ -3,7 +3,7 @@ import os
 
 from gi.repository import GLib
 
-from translation import Translation
+import translation
 from .file_utils import uri_to_path as _uri_to_path
 from .notify import notify, logger
 
@@ -90,9 +90,9 @@ class ChecksumOps:
                 self.primary_clipboard.set(value)
 
             if len(results) == 1:
-                notify(Translation.t("notify_file_checksum_ok").format(algo_name.upper()))
+                notify(translation.gettext("notify_file_checksum_ok") % (algo_name.upper(),))
             else:
-                notify(Translation.t("notify_files_checksum_ok").format(len(results), algo_name.upper()))
+                notify(translation.gettext("notify_files_checksum_ok") % (len(results), algo_name.upper()))
         return False
 
     def get_available_algorithms(self):

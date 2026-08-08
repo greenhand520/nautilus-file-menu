@@ -2,7 +2,7 @@ import os
 import shlex
 from urllib.parse import urlparse, unquote
 from .notify import notify
-from translation import Translation
+import translation
 
 
 class CopyOps:
@@ -44,7 +44,7 @@ class CopyOps:
                 content.append(_file.read())
 
         self._copy_value(content)
-        notify(Translation.t("notify_file_contents_copied").format(file.get_name()))
+        notify(translation.gettext("notify_file_contents_copied") % (file.get_name(),))
 
     def _copy_value(self, value):
         if len(value) > 0:

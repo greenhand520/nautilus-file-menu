@@ -1,0 +1,122 @@
+# English translation for nautilus-file-menu
+# Copyright (C) 2026
+# This file is distributed under the same license as the nautilus-file-menu package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nautilus-file-menu\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-08 19:26+0800\n"
+"PO-Revision-Date: 2026-08-08\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: nautilus_file_menu.py:177
+msgid "copy_paths"
+msgstr "Copy paths"
+
+#: nautilus_file_menu.py:177
+msgid "copy_path"
+msgstr "Copy path"
+
+#: nautilus_file_menu.py:181
+msgid "copy_uris"
+msgstr "Copy URIs"
+
+#: nautilus_file_menu.py:181
+msgid "copy_uri"
+msgstr "Copy URI"
+
+#: nautilus_file_menu.py:185
+msgid "copy_names"
+msgstr "Copy names"
+
+#: nautilus_file_menu.py:185
+msgid "copy_name"
+msgstr "Copy name"
+
+#: nautilus_file_menu.py:194
+msgid "copy_content"
+msgstr "Copy content"
+
+#: nautilus_file_menu.py:225
+msgid "copy_more"
+msgstr "Copy more"
+
+#: nautilus_file_menu.py:254
+msgid "dissolve_folder"
+msgstr "Dissolve folder"
+
+#: nautilus_file_menu.py:262
+msgid "move_into_folder"
+msgstr "Move into folder"
+
+#: nautilus_file_menu.py:334
+msgid "open_with_jetbrains"
+msgstr "JetBrains"
+
+#: nautilus_file_menu.py:354
+msgid "open_with_ide_submenu"
+msgstr "Open with IDE"
+
+#: nautilus_file_menu.py:382 nautilus_file_menu.py:395
+#: nautilus_file_menu.py:414
+msgid "open_in_terminal"
+msgstr "Open in %(name)s"
+
+#: nautilus_file_menu.py:406
+msgid "open_in_terminal_submenu"
+msgstr "Open in terminal"
+
+#: nautilus_file_menu.py:446
+msgid "checksum"
+msgstr "Checksum (%(algo)s)"
+
+#: nautilus_file_menu.py:470
+msgid "checksum_submenu"
+msgstr "Checksum"
+
+#: modules/checksum_ops.py:93
+msgid "notify_file_checksum_ok"
+msgstr "%s copied to clipboard"
+
+#: modules/checksum_ops.py:95
+msgid "notify_files_checksum_ok"
+msgstr "%s of %s files copied to clipboard"
+
+#: modules/copy_ops.py:47
+msgid "notify_file_contents_copied"
+msgstr "Contents of file %s copied to clipboard"
+
+#: modules/folder_ops.py:60
+msgid "dialog_move_into_folder_title"
+msgstr "Move into folder"
+
+#: modules/folder_ops.py:70
+msgid "dialog_folder_name_label"
+msgstr "Enter folder name:"
+
+#: modules/folder_ops.py:74
+msgid "dialog_default_folder_name"
+msgstr "New folder"
+
+#: modules/folder_ops.py:80
+msgid "dialog_cancel"
+msgstr "Cancel"
+
+#: modules/folder_ops.py:84
+msgid "dialog_create"
+msgstr "Create"
+
+#~ msgid "open_with_ide"
+#~ msgstr "Open with %(ide)s"
+
+#~ msgid "dialog_ok"
+#~ msgstr "OK"
+
+#~ msgid "dialog_continue"
+#~ msgstr "Continue"

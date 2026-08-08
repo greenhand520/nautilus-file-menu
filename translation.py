@@ -1,54 +1,44 @@
+import gettext as _gettext
 import locale
-import json
-import glob
 import os
 
+DOMAIN = "nautilus-file-menu"
+_LOCALE_DIR = os.path.join(os.path.dirname(__file__), "po")
+if not os.path.isdir(_LOCALE_DIR):
+    _LOCALE_DIR = os.path.join(os.path.dirname(__file__), "locale")
 
-class Translation:
-    _translations_path = os.path.join(os.path.dirname(__file__), 'translations')
-    _translations: dict[str, str] = {}
-    _default_translations: dict[str, str] = {}
-    lang_code = "auto"
 
-    @staticmethod
-    def select_language(lang_code="auto"):
-        if not lang_code or lang_code == "auto":
-            try:
-                default_locale = locale.getlocale()[0] or os.environ.get("LANG", "en")
-                lang = default_locale.split("_")
-                lang_code = lang[0] if len(lang) else "en"
-            except (AttributeError, ValueError):
-                lang_code = "en"
+_translator = None
 
-        if lang_code in Translation.available_languages():
-            Translation.lang_code = lang_code
-        else:
-            Translation.lang_code = "en"
 
-        Translation._load_lang(Translation.lang_code)
+def _setup(lang_code="auto"):
+    """Initialize gettext and return the translation function."""
+    if lang_code and lang_code != "auto":
+        languages = [lang_code]
+    else:
+        try:
+            sys_locale = locale.getlocale()[0] or os.environ.get("LANG", "en")
+            languages = [sys_locale]
+        except (AttributeError, ValueError):
+            languages = ["en"]
 
-    @staticmethod
-    def _load_lang(lang_code):
-        file_path = Translation._translations_path + '/' + lang_code + ".json"
-        if os.path.isfile(file_path):
-            with open(file_path) as json_file:
-                Translation._translations = json.load(json_file)
+    t = _gettext.translation(DOMAIN, _LOCALE_DIR, languages=languages, fallback=True)
+    return t.gettext
 
-        file_path_en = Translation._translations_path + "/en.json"
-        if os.path.isfile(file_path_en):
-            with open(file_path_en) as json_file:
-                Translation._default_translations = json.load(json_file)
 
-    @staticmethod
-    def available_languages():
-        return [os.path.splitext(os.path.basename(x))[0] for x in glob.glob(Translation._translations_path + '/*.json')]
+def select_language(lang_code="auto"):
+    """Re-initialize translation with a specific language."""
+    global _translator
+    _translator = _setup(lang_code)
 
-    @staticmethod
-    def t(translation) -> str:
-        if not Translation._translations:
-            Translation.select_language()
-        if translation in Translation._translations:
-            return Translation._translations[translation]
-        elif translation in Translation._default_translations:
-            return Translation._default_translations[translation]
-        return translation
+
+def gettext(msgid: str) -> str:
+    """Translate a message ID."""
+    global _translator
+    if _translator is None:
+        _translator = _setup()
+    return _translator(msgid)
+
+
+# Initialize on import
+_translator = _setup()
