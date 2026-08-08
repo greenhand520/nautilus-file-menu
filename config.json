@@ -7,6 +7,10 @@
     "open_terminal": true,
     "checksum": true
   },
+  "selections": {
+    "clipboard": true,
+    "primary": true
+  },
   "language": "auto",
   "log_level": "WARNING",
   "separator": "\n",
@@ -31,10 +35,6 @@
       }
     },
     "collapse_menu": true,
-    "selections": {
-      "clipboard": true,
-      "primary": true
-    },
     "escape_value_items": false,
     "escape_value": false
   },

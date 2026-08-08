@@ -19,14 +19,15 @@ from gi.repository import Nautilus, GObject, Gtk, Gdk, GLib
 
 class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
     def _window_added(self, application, window):
-        shortcuts: dict[str, str] = self.config.get("shortcuts", {})
-        for key, shortcut_str in shortcuts.items():
+        copy_cfg = self.config.get("copy", {})
+        for item_name, item_cfg in copy_cfg.get("item", {}).items():
+            shortcut_str = item_cfg.get("shortcut", "")
             if shortcut_str:
                 action = Gtk.CallbackAction.new(self._shortcuts_handler)
                 shortcut = Gtk.Shortcut.new(
                     Gtk.ShortcutTrigger.parse_string(shortcut_str), action
                 )
-                shortcut.set_arguments(GLib.Variant.new_string(key))
+                shortcut.set_arguments(GLib.Variant.new_string(item_name))
                 window.add_shortcut(shortcut)
 
     def _window_removed(self, application, window):
@@ -41,68 +42,52 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
         self.selected_files: dict[int, Any] = {}
         self.config: dict[str, Any] = {
-            "items": {
-                "copy_path": True,
-                "copy_uri": True,
-                "copy_name": True,
-                "copy_content": True,
+            "ops_enabled": {
+                "copy": True,
                 "dissolve_folder": True,
                 "move_into_folder": True,
                 "open_ide": True,
+                "open_terminal": True,
                 "checksum": True,
             },
-            "selections": {
-                "clipboard": True,
-                "primary": True,
-            },
-            "shortcuts": {
-                "copy_path": "<Ctrl><Shift>C",
-                "copy_uri": "<Ctrl><Shift>U",
-                "copy_name": "<Ctrl><Shift>D",
-                "copy_content": "<Ctrl><Shift>G",
-            },
             "language": "auto",
-            "separator": ", ",
-            "escape_value_items": False,
-            "escape_value": False,
-            "name_ignore_extension": False,
-            "ide_commands": {
-                "vscode": "code",
-                "code-insiders": "code-insiders",
-                "code-oss": "code-oss",
-                "zed": "zed",
-            },
-            "flatpak_ids": {
-                "vscode": "com.visualstudio.code",
-                "code-insiders": "com.visualstudio.code.insiders",
-                "code-oss": "com.visualstudio.code-oss",
-                "zed": "dev.zed.Zed",
-            },
-            "jetbrains_commands": {
-                "IntelliJ IDEA": "idea",
-                "PyCharm": "pycharm",
-                "WebStorm": "webstorm",
-                "CLion": "clion",
-                "GoLand": "goland",
-                "Rider": "rider",
-                "RubyMine": "rubymine",
-                "PhpStorm": "phpstorm",
-                "DataGrip": "datagrip",
-            },
-            "checksum_algorithms": ["md5", "sha1", "sha256", "sha512"],
             "log_level": "WARNING",
+            "separator": ", ",
+            "copy": {
+                "item": {
+                    "copy_path": {"enabled": True, "shortcut": "<Ctrl><Shift>C"},
+                    "copy_uri": {"enabled": True, "shortcut": "<Ctrl><Shift>U"},
+                    "copy_name": {"enabled": True, "shortcut": "<Ctrl><Shift>D", "ignore_extension": False},
+                    "copy_content": {"enabled": True, "shortcut": "<Ctrl><Shift>G"},
+                },
+                "collapse_menu": True,
+                "selections": {"clipboard": True, "primary": True},
+                "escape_value_items": False,
+                "escape_value": False,
+            },
+            "open_ide": {
+                "other_ides": {},
+                "jetbrains_ides": {"collapse_menu": True},
+            },
+            "open_terminal": {
+                "terminals": {},
+                "collapse_menu": True,
+            },
+            "checksum_algorithms": {
+                "enabled": ["md5", "sha1", "sha256", "sha512"],
+            },
         }
 
         with open(os.path.join(os.path.dirname(__file__), "config.json")) as json_file:
             try:
-                self.config.update(json.load(json_file))
+                user_cfg = json.load(json_file)
+                self._deep_update(self.config, user_cfg)
                 if self.config.get("language"):
                     Translation.select_language(self.config["language"])
                 if self.config.get("log_level"):
                     set_log_level(self.config["log_level"])
             except Exception:
                 traceback.print_exc()
-                pass
 
         # Initialize operation modules
         self.copy_ops = CopyOps(self.config, self.clipboard, self.primary_clipboard)
@@ -115,8 +100,17 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             app.connect("window-added", self._window_added)
             app.connect("window-removed", self._window_removed)
 
+    @staticmethod
+    def _deep_update(base: dict, override: dict):
+        """Recursively merge override into base."""
+        for key, value in override.items():
+            if key in base and isinstance(base[key], dict) and isinstance(value, dict):
+                NautilusFileMenu._deep_update(base[key], value)
+            else:
+                base[key] = value
+
     def _shortcuts_handler(self, window, key) -> bool:
-        action = GLib.Variant.get_string(key)
+        item_name = GLib.Variant.get_string(key)
         window_id = window.get_id()
 
         action_function = {
@@ -124,7 +118,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             "copy_uri": self.copy_ops.copy_uris,
             "copy_name": self.copy_ops.copy_names,
             "copy_content": self.copy_ops.copy_content,
-        }.get(action)
+        }.get(item_name)
 
         if window_id in self.selected_files and action_function:
             action_function(None, self.selected_files[window_id])
@@ -149,23 +143,28 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
     def _create_menu_items(self, files: list[Nautilus.FileInfo], group) -> list[Nautilus.MenuItem]:
         items = []
-        config_items: dict[str, bool] = self.config.get("items", {})
+        ops = self.config.get("ops_enabled", {})
 
-        items.extend(self._create_copy_items(files, group, config_items))
-        items.extend(self._create_folder_items(files, group, config_items))
-        items.extend(self._create_ide_items(files, group, config_items))
-        items.extend(self._create_checksum_items(files, group, config_items))
+        items.extend(self._create_copy_items(files, group, ops))
+        items.extend(self._create_folder_items(files, group, ops))
+        items.extend(self._create_ide_items(files, group, ops))
+        items.extend(self._create_checksum_items(files, group, ops))
 
         return items
 
     # --- Copy operations ---
 
     def _create_copy_items(self, files: list[Nautilus.FileInfo], group,
-                           config_items: dict[str, bool]) -> list[Nautilus.MenuItem]:
+                           ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
         items = []
-        plural = len(files) > 1
+        if not ops.get("copy", True):
+            return items
 
-        if config_items.get("copy_path", True):
+        plural = len(files) > 1
+        copy_cfg = self.config.get("copy", {})
+        copy_items = copy_cfg.get("item", {})
+
+        if copy_items.get("copy_path", {}).get("enabled", True):
             item = Nautilus.MenuItem(
                 name="NautilusFileMenu::CopyPath" + group,
                 label=Translation.t("copy_paths" if plural else "copy_path"),
@@ -173,7 +172,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             item.connect("activate", self.copy_ops.copy_paths, files)
             items.append(item)
 
-        if config_items.get("copy_uri", True):
+        if copy_items.get("copy_uri", {}).get("enabled", True):
             item = Nautilus.MenuItem(
                 name="NautilusFileMenu::CopyUri" + group,
                 label=Translation.t("copy_uris" if plural else "copy_uri"),
@@ -181,7 +180,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             item.connect("activate", self.copy_ops.copy_uris, files)
             items.append(item)
 
-        if config_items.get("copy_name", True):
+        if copy_items.get("copy_name", {}).get("enabled", True):
             item = Nautilus.MenuItem(
                 name="NautilusFileMenu::CopyName" + group,
                 label=Translation.t("copy_names" if plural else "copy_name"),
@@ -189,7 +188,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             item.connect("activate", self.copy_ops.copy_names, files)
             items.append(item)
 
-        if config_items.get("copy_content", True):
+        if copy_items.get("copy_content", {}).get("enabled", True):
             allow_copy_content = ["application/x-shellscript", "application/json"]
             if len(files) == 1 and (
                     files[0].get_mime_type() in allow_copy_content or files[0].get_mime_type().startswith("text/")):
@@ -205,11 +204,11 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
     # --- Folder operations ---
 
     def _create_folder_items(self, files: list[Nautilus.FileInfo], group,
-                             config_items: dict[str, bool]) -> list[Nautilus.MenuItem]:
+                             ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
         items = []
 
         if (
-                config_items.get("dissolve_folder", True)
+                ops.get("dissolve_folder", True)
                 and len(files) == 1
                 and os.path.isdir(_uri_to_path(files[0]))
         ):
@@ -220,7 +219,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             item.connect("activate", self.folder_ops.dissolve_folder, files)
             items.append(item)
 
-        if config_items.get("move_into_folder", True) and len(files) >= 2:
+        if ops.get("move_into_folder", True) and len(files) >= 2:
             item = Nautilus.MenuItem(
                 name="NautilusFileMenu::MoveIntoFolder" + group,
                 label=Translation.t("move_into_folder"),
@@ -233,10 +232,10 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
     # --- IDE operations (single file/folder only) ---
 
     def _create_ide_items(self, files: list[Nautilus.FileInfo], group,
-                          config_items: dict[str, bool]) -> list[Nautilus.MenuItem]:
+                          ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
         items = []
 
-        if not config_items.get("open_ide", True):
+        if not ops.get("open_ide", True):
             return items
         if len(files) != 1:
             return items
@@ -263,25 +262,39 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             submenu.append_item(sub_item)
 
         if jb_ides:
-            jb_submenu = Nautilus.Menu()
-            for jb_label, jb_cmd in jb_ides:
-                jb_item = Nautilus.MenuItem(
-                    name="NautilusFileMenu::OpenIDE_JB_" + jb_cmd + group,
-                    label=jb_label,
-                )
-                jb_item.connect(
-                    "activate",
-                    lambda m, f, c=jb_cmd: self.ide_ops.open_with_ide(m, f, c),
-                    files,
-                )
-                jb_submenu.append_item(jb_item)
+            jb_cfg = self.config.get("open_ide", {}).get("jetbrains_ides", {})
+            if jb_cfg.get("collapse_menu", True):
+                jb_submenu = Nautilus.Menu()
+                for jb_label, jb_cmd in jb_ides:
+                    jb_item = Nautilus.MenuItem(
+                        name="NautilusFileMenu::OpenIDE_JB_" + jb_cmd + group,
+                        label=jb_label,
+                    )
+                    jb_item.connect(
+                        "activate",
+                        lambda m, f, c=jb_cmd: self.ide_ops.open_with_ide(m, f, c),
+                        files,
+                    )
+                    jb_submenu.append_item(jb_item)
 
-            jb_menu_item = Nautilus.MenuItem(
-                name="NautilusFileMenu::OpenIDE_JetBrains" + group,
-                label=Translation.t("open_with_jetbrains"),
-            )
-            jb_menu_item.set_submenu(jb_submenu)
-            submenu.append_item(jb_menu_item)
+                jb_menu_item = Nautilus.MenuItem(
+                    name="NautilusFileMenu::OpenIDE_JetBrains" + group,
+                    label=Translation.t("open_with_jetbrains"),
+                )
+                jb_menu_item.set_submenu(jb_submenu)
+                submenu.append_item(jb_menu_item)
+            else:
+                for jb_label, jb_cmd in jb_ides:
+                    jb_item = Nautilus.MenuItem(
+                        name="NautilusFileMenu::OpenIDE_JB_" + jb_cmd + group,
+                        label=jb_label,
+                    )
+                    jb_item.connect(
+                        "activate",
+                        lambda m, f, c=jb_cmd: self.ide_ops.open_with_ide(m, f, c),
+                        files,
+                    )
+                    submenu.append_item(jb_item)
 
         menu_item = Nautilus.MenuItem(
             name="NautilusFileMenu::OpenIDE" + group,
@@ -295,10 +308,10 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
     # --- Checksum ---
 
     def _create_checksum_items(self, files: list[Nautilus.FileInfo], group,
-                               config_items: dict[str, bool]) -> list[Nautilus.MenuItem]:
+                               ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
         items = []
 
-        if not config_items.get("checksum", True):
+        if not ops.get("checksum", True):
             return items
 
         checksum_files = [f for f in files if not os.path.isdir(_uri_to_path(f))]

@@ -124,9 +124,34 @@ class IdeOps:
         self._detect()
 
     def _detect(self):
-        ide_cmds = self.config.get("ide_commands", IDE_COMMANDS)
-        flatpak_ids = self.config.get("flatpak_ids", FLATPAK_IDS)
-        jb_cmds = self.config.get("jetbrains_commands", JETBRAINS_COMMANDS)
+        ide_cfg = self.config.get("open_ide", {})
+        other_ides = ide_cfg.get("other_ides", {})
+        jb_ides = ide_cfg.get("jetbrains_ides", {})
+
+        # Build cmd/flatpak maps from the new nested structure
+        ide_cmds = {}
+        flatpak_ids = {}
+        for name, cfg in other_ides.items():
+            if isinstance(cfg, dict):
+                if cfg.get("enabled", True):
+                    ide_cmds[name] = cfg.get("cmd", "")
+                    fid = cfg.get("flatpak_id", "")
+                    if fid:
+                        flatpak_ids[name] = fid
+            else:
+                # Legacy format: plain string cmd
+                ide_cmds[name] = cfg
+
+        jb_cmds = {}
+        for name, cfg in jb_ides.items():
+            if name in ("collapse_menu",):
+                continue
+            if isinstance(cfg, dict):
+                if cfg.get("enabled", True):
+                    jb_cmds[name] = cfg.get("cmd", "")
+            else:
+                jb_cmds[name] = cfg
+
         all_names = set(ide_cmds.keys()) | set(jb_cmds.keys())
 
         # --- Phase 1: Binary lookup ---

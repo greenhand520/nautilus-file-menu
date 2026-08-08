@@ -22,9 +22,12 @@ class CopyOps:
         self._copy_value(list(map(lambda f: f.get_activation_uri(), files)))
 
     def copy_names(self, menu, files):
+        copy_cfg = self.config.get("copy", {})
+        ignore_ext = copy_cfg.get("item", {}).get("copy_name", {}).get("ignore_extension", False)
+
         def _name(file):
             path = unquote(os.path.basename(file.get_activation_uri()))
-            if self.config.get("name_ignore_extension", False):
+            if ignore_ext:
                 path = os.path.splitext(path)[0]
             return path
 
@@ -45,12 +48,14 @@ class CopyOps:
 
     def _copy_value(self, value):
         if len(value) > 0:
-            if self.config.get("escape_value_items", False):
+            copy_cfg = self.config.get("copy", {})
+
+            if copy_cfg.get("escape_value_items", False):
                 value = list(map(lambda x: shlex.quote(x), value))
 
             new_value = self.config.get("separator", ", ").join(value)
 
-            if self.config.get("escape_value", False):
+            if copy_cfg.get("escape_value", False):
                 new_value = shlex.quote(new_value)
 
             selections = self.config.get("selections", {"clipboard": True, "primary": True})
