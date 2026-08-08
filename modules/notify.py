@@ -2,10 +2,9 @@ import os
 import logging
 from gi.repository import Gio
 
-LOG_DIR = os.path.expanduser("~/.local/share/nautilus-file-menu")
+# Log file lives next to the extension, so uninstall cleans it up
+LOG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_FILE = os.path.join(LOG_DIR, "extension.log")
-
-os.makedirs(LOG_DIR, exist_ok=True)
 
 logger = logging.getLogger("nautilus-file-menu")
 logger.setLevel(logging.WARNING)
@@ -51,4 +50,4 @@ def notify(title, body=""):
         notification.set_priority(Gio.NotificationPriority.NORMAL)
         app.send_notification(None, notification)
     except Exception as e:
-        logger.exception(f"Failed to send notification, cause: {e}")
+        logger.exception("Failed to send notification, cause %s", e)

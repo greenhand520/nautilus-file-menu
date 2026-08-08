@@ -7,11 +7,11 @@ from gi import require_version
 
 from modules.checksum_ops import ChecksumOps
 from modules.copy_ops import CopyOps
-from modules.file_utils import uri_to_path as _uri_to_path
+from modules.file_utils import uri_to_path as _uri_to_path, COPY_CONTENT_MIME_TYPES
 from modules.folder_ops import FolderOps
 from modules.ide_ops import IdeOps, is_file_openable_in_ide
 from modules.terminal_ops import TerminalOps
-from modules.notify import set_log_level
+from modules.notify import set_log_level, logger
 import translation
 
 require_version('Gtk', '4.0')
@@ -83,11 +83,13 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             try:
                 user_cfg = json.load(json_file)
                 self._deep_update(self.config, user_cfg)
-                if self.config.get("language"):
-                    translation.select_language(self.config["language"])
-                if self.config.get("log_level"):
-                    set_log_level(self.config["log_level"])
+                lang = self.config.get("language", "auto")
+                log_level = self.config.get("log_level", "WARNING")
+                translation.select_language(lang)
+                set_log_level(log_level)
+                logger.info("Config loaded: language=%s, log_level=%s", lang, log_level)
             except Exception:
+                logger.exception("Failed to load config")
                 traceback.print_exc()
 
         # Initialize operation modules
@@ -114,6 +116,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
     def _shortcuts_handler(self, window, key) -> bool:
         item_name = GLib.Variant.get_string(key)
         window_id = window.get_id()
+        logger.debug("Shortcut triggered: item=%s, window=%s", item_name, window_id)
 
         action_function = {
             "copy_path": self.copy_ops.copy_paths,
@@ -136,11 +139,15 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         files = args[-1]
 
         self.selected_files[window.get_id()] = files
+        # logger.debug("get_file_items: %d file(s) selected", len(files))
 
         return self._create_menu_items(files, "File")
 
     def get_background_items(self, *args):
         folder = args[-1]
+        loc = folder.get_location()
+        path = loc.get_path() if loc else "?"
+        logger.debug("get_background_items: folder=%s", path)
         items = []
         ops = self.config.get("ops_enabled", {})
         items.extend(self._create_ide_items([folder], "Background", ops))
@@ -186,9 +193,8 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             entries.append(("CopyName", label, self.copy_ops.copy_names, files))
 
         if copy_items_cfg.get("copy_content", {}).get("enabled", True):
-            allow_copy_content = ["application/x-shellscript", "application/json"]
             if len(files) == 1 and (
-                    files[0].get_mime_type() in allow_copy_content or files[0].get_mime_type().startswith("text/")):
+                    files[0].get_mime_type() in COPY_CONTENT_MIME_TYPES or files[0].get_mime_type().startswith("text/")):
                 entries.append((
                     "CopyContent",
                     translation.gettext("copy_content"),
@@ -283,6 +289,22 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         jb_ides = self.ide_ops.get_jetbrains_ides()
         if not other_ides and not jb_ides:
             return items
+
+        all_ides = other_ides + jb_ides
+
+        # Single IDE total: show directly, no submenu
+        if len(all_ides) == 1:
+            label, cmd = all_ides[0]
+            item = Nautilus.MenuItem(
+                name="NautilusFileMenu::OpenIDE_" + cmd + group,
+                label=translation.gettext("open_with_ide") % {"ide": label},
+            )
+            item.connect(
+                "activate",
+                lambda m, f, c=cmd: self.ide_ops.open_with_ide(m, f, c),
+                files,
+            )
+            return [item]
 
         submenu = Nautilus.Menu()
 

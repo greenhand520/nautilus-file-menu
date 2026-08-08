@@ -7,12 +7,8 @@
     "open_terminal": true,
     "checksum": true
   },
-  "selections": {
-    "clipboard": true,
-    "primary": true
-  },
   "language": "auto",
-  "log_level": "WARNING",
+  "log_level": "DEBUG",
   "separator": "\n",
   "copy": {
     "item": {
@@ -35,6 +31,10 @@
       }
     },
     "collapse_menu": true,
+    "selections": {
+      "clipboard": true,
+      "primary": true
+    },
     "escape_value_items": false,
     "escape_value": false
   },

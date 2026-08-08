@@ -1,5 +1,6 @@
 import gettext as _gettext
 import locale
+import logging
 import os
 
 DOMAIN = "nautilus-file-menu"
@@ -9,6 +10,9 @@ if not os.path.isdir(_LOCALE_DIR):
 
 
 _translator = None
+
+
+_logger = logging.getLogger("nautilus-file-menu")
 
 
 def _setup(lang_code="auto"):
@@ -23,6 +27,10 @@ def _setup(lang_code="auto"):
             languages = ["en"]
 
     t = _gettext.translation(DOMAIN, _LOCALE_DIR, languages=languages, fallback=True)
+    if type(t) is _gettext.NullTranslations:
+        _logger.warning("No translation found for language '%s', using fallback", lang_code)
+    else:
+        _logger.debug("Translation loaded: language=%s, locale_dir=%s", lang_code, _LOCALE_DIR)
     return t.gettext
 
 

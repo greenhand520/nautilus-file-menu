@@ -3,7 +3,7 @@ import glob
 import os
 import subprocess
 
-from .file_utils import uri_to_path as _uri_to_path, find_binary
+from .file_utils import uri_to_path as _uri_to_path, find_binary, is_flatpak_installed
 from .notify import logger
 
 IDE_COMMANDS = {
@@ -72,17 +72,6 @@ def _find_jetbrains_binary(cmd):
             if os.access(match, os.X_OK):
                 return match
     return None
-
-
-def _is_flatpak_installed(app_id):
-    try:
-        result = subprocess.run(
-            ["flatpak", "info", app_id],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-        )
-        return result.returncode == 0
-    except FileNotFoundError:
-        return False
 
 
 def _is_jetbrains_name(name):
@@ -198,14 +187,14 @@ class IdeOps:
                     if os.path.isfile(binary) and os.access(binary, os.X_OK):
                         self._add_ide(matched_name, [binary])
                 except Exception as e:
-                    logger.exception(f"Failed to detect IDEs, cause: {e}")
+                    logger.exception("Failed to detect IDEs, cause: %s", e)
 
         # --- Phase 3: Flatpak ---
         # note⚠️: not tested
         for name, app_id in flatpak_ids.items():
             if name in self.available_ides or name in self.available_jetbrains:
                 continue
-            if _is_flatpak_installed(app_id):
+            if is_flatpak_installed(app_id):
                 self._add_ide(name, ["flatpak", "run", app_id])
 
     def _add_ide(self, name, cmd_list):

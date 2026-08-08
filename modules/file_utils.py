@@ -1,6 +1,7 @@
 import errno
 import os
 import shutil
+import subprocess
 from collections import defaultdict
 from pathlib import Path
 from urllib.parse import urlparse, unquote
@@ -17,6 +18,22 @@ def uri_to_path(file):
     """Convert a Nautilus FileInfo URI to an absolute filesystem path."""
     p = urlparse(file.get_activation_uri())
     return os.path.abspath(os.path.join(p.netloc, unquote(p.path)))
+
+
+# MIME types allowed for "copy content" (in addition to text/*)
+COPY_CONTENT_MIME_TYPES = ["application/x-shellscript", "application/json"]
+
+
+def is_flatpak_installed(app_id):
+    """Check if a Flatpak app is installed."""
+    try:
+        result = subprocess.run(
+            ["flatpak", "info", app_id],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        return result.returncode == 0
+    except FileNotFoundError:
+        return False
 
 
 # Standard binary search dirs

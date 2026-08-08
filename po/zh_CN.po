@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-file-menu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 19:26+0800\n"
+"POT-Creation-Date: 2026-08-08 20:04+0800\n"
 "PO-Revision-Date: 2026-08-08\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Simplified)\n"
@@ -15,105 +15,106 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: nautilus_file_menu.py:177
+#: nautilus_file_menu.py:184
 msgid "copy_paths"
 msgstr "复制各个路径"
 
-#: nautilus_file_menu.py:177
+#: nautilus_file_menu.py:184
 msgid "copy_path"
 msgstr "复制路径"
 
-#: nautilus_file_menu.py:181
+#: nautilus_file_menu.py:188
 msgid "copy_uris"
 msgstr "复制各个 URI"
 
-#: nautilus_file_menu.py:181
+#: nautilus_file_menu.py:188
 msgid "copy_uri"
 msgstr "复制URI"
 
-#: nautilus_file_menu.py:185
+#: nautilus_file_menu.py:192
 msgid "copy_names"
 msgstr "复制各个文件名"
 
-#: nautilus_file_menu.py:185
+#: nautilus_file_menu.py:192
 msgid "copy_name"
 msgstr "复制文件名"
 
-#: nautilus_file_menu.py:194
+#: nautilus_file_menu.py:200
 msgid "copy_content"
 msgstr "复制文本内容"
 
-#: nautilus_file_menu.py:225
+#: nautilus_file_menu.py:231
 msgid "copy_more"
 msgstr "复制更多"
 
-#: nautilus_file_menu.py:254
+#: nautilus_file_menu.py:260
 msgid "dissolve_folder"
 msgstr "解散文件夹"
 
-#: nautilus_file_menu.py:262
+#: nautilus_file_menu.py:268
 msgid "move_into_folder"
 msgstr "收进文件夹"
 
-#: nautilus_file_menu.py:334
+#: nautilus_file_menu.py:300
+msgid "open_with_ide"
+msgstr "用 %(ide)s 打开"
+
+#: nautilus_file_menu.py:356
 msgid "open_with_jetbrains"
 msgstr "JetBrains"
 
-#: nautilus_file_menu.py:354
+#: nautilus_file_menu.py:376
 msgid "open_with_ide_submenu"
 msgstr "用 IDE 打开"
 
-#: nautilus_file_menu.py:382 nautilus_file_menu.py:395
-#: nautilus_file_menu.py:414
+#: nautilus_file_menu.py:404 nautilus_file_menu.py:417
+#: nautilus_file_menu.py:436
 msgid "open_in_terminal"
 msgstr "在 %(name)s 中打开"
 
-#: nautilus_file_menu.py:406
+#: nautilus_file_menu.py:428
 msgid "open_in_terminal_submenu"
 msgstr "在终端中打开"
 
-#: nautilus_file_menu.py:446
+#: nautilus_file_menu.py:468
 msgid "checksum"
 msgstr "校验和 (%(algo)s)"
 
-#: nautilus_file_menu.py:470
+#: nautilus_file_menu.py:492
 msgid "checksum_submenu"
 msgstr "校验和"
 
-#: modules/checksum_ops.py:93
-msgid "notify_file_checksum_ok"
-msgstr "%s 已复制到剪贴板"
-
 #: modules/checksum_ops.py:95
+msgid "notify_file_checksum_ok"
+msgstr "%(algo)s 已复制到剪贴板"
+
+#: modules/checksum_ops.py:97
 msgid "notify_files_checksum_ok"
-msgstr "%s个文件的%s已复制到剪贴板"
+msgstr "%(count)s个文件的%(algo)s已复制到剪贴板"
 
-#: modules/copy_ops.py:47
+#: modules/copy_ops.py:51
 msgid "notify_file_contents_copied"
-msgstr "文件 %s 内容已复制到剪贴板"
+msgstr "文件 %(file)s 内容已复制到剪贴板"
 
-#: modules/folder_ops.py:60
+#: modules/folder_ops.py:64
 msgid "dialog_move_into_folder_title"
 msgstr "收进文件夹"
 
-#: modules/folder_ops.py:70
+#: modules/folder_ops.py:74
 msgid "dialog_folder_name_label"
 msgstr "请输入文件夹名称："
 
-#: modules/folder_ops.py:74
+#: modules/folder_ops.py:78
 msgid "dialog_default_folder_name"
 msgstr "新文件夹"
 
-#: modules/folder_ops.py:80
+#: modules/folder_ops.py:84
 msgid "dialog_cancel"
 msgstr "取消"
 
-#: modules/folder_ops.py:84
+#: modules/folder_ops.py:88
 msgid "dialog_create"
 msgstr "创建"
-
-#~ msgid "open_with_ide"
-#~ msgstr "用 %(ide)s 打开"
 
 #~ msgid "dialog_ok"
 #~ msgstr "确定"

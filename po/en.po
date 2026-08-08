@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-file-menu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 19:26+0800\n"
+"POT-Creation-Date: 2026-08-08 20:04+0800\n"
 "PO-Revision-Date: 2026-08-08\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -15,105 +15,106 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: nautilus_file_menu.py:177
+#: nautilus_file_menu.py:184
 msgid "copy_paths"
 msgstr "Copy paths"
 
-#: nautilus_file_menu.py:177
+#: nautilus_file_menu.py:184
 msgid "copy_path"
 msgstr "Copy path"
 
-#: nautilus_file_menu.py:181
+#: nautilus_file_menu.py:188
 msgid "copy_uris"
 msgstr "Copy URIs"
 
-#: nautilus_file_menu.py:181
+#: nautilus_file_menu.py:188
 msgid "copy_uri"
 msgstr "Copy URI"
 
-#: nautilus_file_menu.py:185
+#: nautilus_file_menu.py:192
 msgid "copy_names"
 msgstr "Copy names"
 
-#: nautilus_file_menu.py:185
+#: nautilus_file_menu.py:192
 msgid "copy_name"
 msgstr "Copy name"
 
-#: nautilus_file_menu.py:194
+#: nautilus_file_menu.py:200
 msgid "copy_content"
 msgstr "Copy content"
 
-#: nautilus_file_menu.py:225
+#: nautilus_file_menu.py:231
 msgid "copy_more"
 msgstr "Copy more"
 
-#: nautilus_file_menu.py:254
+#: nautilus_file_menu.py:260
 msgid "dissolve_folder"
 msgstr "Dissolve folder"
 
-#: nautilus_file_menu.py:262
+#: nautilus_file_menu.py:268
 msgid "move_into_folder"
 msgstr "Move into folder"
 
-#: nautilus_file_menu.py:334
+#: nautilus_file_menu.py:300
+msgid "open_with_ide"
+msgstr "Open with %(ide)s"
+
+#: nautilus_file_menu.py:356
 msgid "open_with_jetbrains"
 msgstr "JetBrains"
 
-#: nautilus_file_menu.py:354
+#: nautilus_file_menu.py:376
 msgid "open_with_ide_submenu"
 msgstr "Open with IDE"
 
-#: nautilus_file_menu.py:382 nautilus_file_menu.py:395
-#: nautilus_file_menu.py:414
+#: nautilus_file_menu.py:404 nautilus_file_menu.py:417
+#: nautilus_file_menu.py:436
 msgid "open_in_terminal"
 msgstr "Open in %(name)s"
 
-#: nautilus_file_menu.py:406
+#: nautilus_file_menu.py:428
 msgid "open_in_terminal_submenu"
 msgstr "Open in terminal"
 
-#: nautilus_file_menu.py:446
+#: nautilus_file_menu.py:468
 msgid "checksum"
 msgstr "Checksum (%(algo)s)"
 
-#: nautilus_file_menu.py:470
+#: nautilus_file_menu.py:492
 msgid "checksum_submenu"
 msgstr "Checksum"
 
-#: modules/checksum_ops.py:93
-msgid "notify_file_checksum_ok"
-msgstr "%s copied to clipboard"
-
 #: modules/checksum_ops.py:95
+msgid "notify_file_checksum_ok"
+msgstr "%(algo)s copied to clipboard"
+
+#: modules/checksum_ops.py:97
 msgid "notify_files_checksum_ok"
-msgstr "%s of %s files copied to clipboard"
+msgstr "%(algo)s for %(count)s files copied to clipboard"
 
-#: modules/copy_ops.py:47
+#: modules/copy_ops.py:51
 msgid "notify_file_contents_copied"
-msgstr "Contents of file %s copied to clipboard"
+msgstr "Contents of file %(file)s copied to clipboard"
 
-#: modules/folder_ops.py:60
+#: modules/folder_ops.py:64
 msgid "dialog_move_into_folder_title"
 msgstr "Move into folder"
 
-#: modules/folder_ops.py:70
+#: modules/folder_ops.py:74
 msgid "dialog_folder_name_label"
 msgstr "Enter folder name:"
 
-#: modules/folder_ops.py:74
+#: modules/folder_ops.py:78
 msgid "dialog_default_folder_name"
 msgstr "New folder"
 
-#: modules/folder_ops.py:80
+#: modules/folder_ops.py:84
 msgid "dialog_cancel"
 msgstr "Cancel"
 
-#: modules/folder_ops.py:84
+#: modules/folder_ops.py:88
 msgid "dialog_create"
 msgstr "Create"
-
-#~ msgid "open_with_ide"
-#~ msgstr "Open with %(ide)s"
 
 #~ msgid "dialog_ok"
 #~ msgstr "OK"

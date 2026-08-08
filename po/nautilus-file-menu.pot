@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-file-menu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-08 19:31+0800\n"
+"POT-Creation-Date: 2026-08-08 20:04+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,99 +17,103 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: nautilus_file_menu.py:177
+#: nautilus_file_menu.py:184
 msgid "copy_paths"
 msgstr ""
 
-#: nautilus_file_menu.py:177
+#: nautilus_file_menu.py:184
 msgid "copy_path"
 msgstr ""
 
-#: nautilus_file_menu.py:181
+#: nautilus_file_menu.py:188
 msgid "copy_uris"
 msgstr ""
 
-#: nautilus_file_menu.py:181
+#: nautilus_file_menu.py:188
 msgid "copy_uri"
 msgstr ""
 
-#: nautilus_file_menu.py:185
+#: nautilus_file_menu.py:192
 msgid "copy_names"
 msgstr ""
 
-#: nautilus_file_menu.py:185
+#: nautilus_file_menu.py:192
 msgid "copy_name"
 msgstr ""
 
-#: nautilus_file_menu.py:194
+#: nautilus_file_menu.py:200
 msgid "copy_content"
 msgstr ""
 
-#: nautilus_file_menu.py:225
+#: nautilus_file_menu.py:231
 msgid "copy_more"
 msgstr ""
 
-#: nautilus_file_menu.py:254
+#: nautilus_file_menu.py:260
 msgid "dissolve_folder"
 msgstr ""
 
-#: nautilus_file_menu.py:262
+#: nautilus_file_menu.py:268
 msgid "move_into_folder"
 msgstr ""
 
-#: nautilus_file_menu.py:334
+#: nautilus_file_menu.py:300
+msgid "open_with_ide"
+msgstr ""
+
+#: nautilus_file_menu.py:356
 msgid "open_with_jetbrains"
 msgstr ""
 
-#: nautilus_file_menu.py:354
+#: nautilus_file_menu.py:376
 msgid "open_with_ide_submenu"
 msgstr ""
 
-#: nautilus_file_menu.py:382 nautilus_file_menu.py:395
-#: nautilus_file_menu.py:414
+#: nautilus_file_menu.py:404 nautilus_file_menu.py:417
+#: nautilus_file_menu.py:436
 msgid "open_in_terminal"
 msgstr ""
 
-#: nautilus_file_menu.py:406
+#: nautilus_file_menu.py:428
 msgid "open_in_terminal_submenu"
 msgstr ""
 
-#: nautilus_file_menu.py:446
+#: nautilus_file_menu.py:468
 msgid "checksum"
 msgstr ""
 
-#: nautilus_file_menu.py:470
+#: nautilus_file_menu.py:492
 msgid "checksum_submenu"
 msgstr ""
 
-#: modules/checksum_ops.py:93
+#: modules/checksum_ops.py:95
 msgid "notify_file_checksum_ok"
 msgstr ""
 
-#: modules/checksum_ops.py:95
+#: modules/checksum_ops.py:97
 msgid "notify_files_checksum_ok"
 msgstr ""
 
-#: modules/copy_ops.py:47
+#: modules/copy_ops.py:51
 msgid "notify_file_contents_copied"
 msgstr ""
 
-#: modules/folder_ops.py:60
+#: modules/folder_ops.py:64
 msgid "dialog_move_into_folder_title"
 msgstr ""
 
-#: modules/folder_ops.py:70
+#: modules/folder_ops.py:74
 msgid "dialog_folder_name_label"
 msgstr ""
 
-#: modules/folder_ops.py:74
+#: modules/folder_ops.py:78
 msgid "dialog_default_folder_name"
 msgstr ""
 
-#: modules/folder_ops.py:80
+#: modules/folder_ops.py:84
 msgid "dialog_cancel"
 msgstr ""
 
-#: modules/folder_ops.py:84
+#: modules/folder_ops.py:88
 msgid "dialog_create"
 msgstr ""

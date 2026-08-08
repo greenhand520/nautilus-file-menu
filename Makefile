@@ -2,16 +2,15 @@ SHELL=/bin/bash
 EXT_DIR=~/.local/share/nautilus-python/extensions
 nautilus_path=`which nautilus`
 POT_FILE=po/nautilus-file-menu.pot
-PO_FILES=po/*.po
+PO_FILES=po/[a-z]*.po
 SRC_FILES=nautilus_file_menu.py modules/*.py
 
-# Compile MO from PO into po/{lang}/LC_MESSAGES/ (gettext standard layout)
+# Compile MO from PO into target/{lang}/LC_MESSAGES/ (gettext standard layout)
 define compile_po
 	@for po in $(PO_FILES); do \
 		lang=$$(basename $$po .po); \
-		dest=po/$$lang/LC_MESSAGES; \
-		mkdir -p $$dest; \
-		msgfmt -o $$dest/nautilus-file-menu.mo $$po; \
+		mkdir -p $(1)/$$lang/LC_MESSAGES; \
+		msgfmt -o $(1)/$$lang/LC_MESSAGES/nautilus-file-menu.mo $$po; \
 	done
 endef
 
@@ -23,8 +22,7 @@ install:
 	cp nautilus-file-menu.py $(EXT_DIR)
 	cp nautilus_file_menu.py translation.py config.json $(EXT_DIR)/nautilus-file-menu
 	cp -rf modules $(EXT_DIR)/nautilus-file-menu
-	$(compile_po)
-	cp -rf po $(EXT_DIR)/nautilus-file-menu
+	$(call compile_po,$(EXT_DIR)/nautilus-file-menu/locale)
 	@echo 'Restarting nautilus'
 	@${nautilus_path} -q||true
 
@@ -48,8 +46,8 @@ msgmerge:  ## Update PO files from POT template
 		msgmerge -U $$po $(POT_FILE); \
 	done
 
-msgfmt:  ## Compile PO files to MO binary
-	$(compile_po)
+msgfmt:  ## Compile PO files to MO binary (in po/ for dev)
+	$(call compile_po,po)
 
 i18n: xgettext msgmerge msgfmt  ## Full i18n pipeline: extract → merge → compile
 

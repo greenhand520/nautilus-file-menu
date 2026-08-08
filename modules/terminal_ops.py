@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from .file_utils import uri_to_path as _uri_to_path, find_binary
+from .file_utils import uri_to_path as _uri_to_path, find_binary, is_flatpak_installed
 from .notify import logger
 
 
@@ -35,24 +35,13 @@ class TerminalOps:
                     continue
 
                 # Phase 2: flatpak
-                if flatpak_id and self._is_flatpak_installed(flatpak_id):
+                if flatpak_id and is_flatpak_installed(flatpak_id):
                     cfg_copy = dict(cfg)
                     cfg_copy["_flatpak"] = True
                     self.available_terminals.append((name, cfg_copy))
                     logger.info("Terminal detected (flatpak): %s → %s", name, flatpak_id)
         except Exception as e:
             logger.exception("Failed to detect open terminal cfg, cause: %s", e)
-
-    @staticmethod
-    def _is_flatpak_installed(app_id):
-        try:
-            result = subprocess.run(
-                ["flatpak", "info", app_id],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            )
-            return result.returncode == 0
-        except FileNotFoundError:
-            return False
 
     def open_terminal(self, menu, files, cfg):
         """Open terminal in the given directory."""
@@ -68,6 +57,8 @@ class TerminalOps:
                 target = os.path.dirname(target)
         else:
             target = os.path.expanduser("~")
+
+        logger.debug("Opening terminal in: %s", target)
 
         # Build command with path substitution
         if cfg.get("_flatpak"):

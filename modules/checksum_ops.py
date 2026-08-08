@@ -26,10 +26,12 @@ class ChecksumOps:
         self.algorithms = algo_cfg.get("enabled", ["md5", "sha1", "sha256", "sha512"])
 
     def compute_checksum(self, menu, files, algo_name):
-        """计算所选文件的校验和并复制到剪贴板"""
+        """Compute checksum for selected files and copy to clipboard."""
         hasher_cls = ALGORITHMS.get(algo_name)
         if not hasher_cls:
             return
+
+        logger.debug("compute_checksum: algo=%s, %d file(s)", algo_name, len(files))
 
         paths = [_uri_to_path(f) for f in files]
         results = []
@@ -51,7 +53,7 @@ class ChecksumOps:
                     results.append(f"{hasher.hexdigest()}  {filename}")
                     file_index += 1
             except Exception as e:
-                logger.exception(f"hash step error, cause: {e}")
+                logger.exception("hash step error: %s", e)
                 if fh:
                     fh.close()
                 file_index += 1
@@ -78,21 +80,21 @@ class ChecksumOps:
                     results.append(f"{hasher.hexdigest()}  {filename}")
                     file_index += 1
             except Exception as e:
-                logger.exception(f"hash step error, cause: {e}")
+                logger.exception("hash step error: %s", e)
                 file_index += 1
 
         # All files done — copy to clipboard and notify
         if results:
             value = "\n".join(results)
             self.clipboard.set(value)
-            selections = self.config.get("selections", {"clipboard": True, "primary": True})
+            selections = self.config.get("copy", {}).get("selections", {"clipboard": True, "primary": True})
             if selections.get("primary", False):
                 self.primary_clipboard.set(value)
 
             if len(results) == 1:
-                notify(translation.gettext("notify_file_checksum_ok") % (algo_name.upper(),))
+                notify(translation.gettext("notify_file_checksum_ok") % {"algo": algo_name.upper()})
             else:
-                notify(translation.gettext("notify_files_checksum_ok") % (len(results), algo_name.upper()))
+                notify(translation.gettext("notify_files_checksum_ok") % {"count": len(results), "algo": algo_name.upper()})
         return False
 
     def get_available_algorithms(self):

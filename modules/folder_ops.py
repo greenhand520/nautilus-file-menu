@@ -33,6 +33,8 @@ class FolderOps:
         if not os.path.isdir(folder_path):
             return
 
+        logger.debug("dissolve_folder: %s", folder_path)
+
         parent_path = os.path.dirname(folder_path)
 
         move_failed = False
@@ -53,9 +55,11 @@ class FolderOps:
             logger.error("dissolve_folder: failed to remove folder: %s", folder_path)
 
     def move_into_folder(self, menu, files):
-        """创建一个新文件夹并将所有选定的文件移入"""
+        """Create a new folder and move all selected files into it."""
         if len(files) < 2:
             return
+
+        logger.debug("move_into_folder: %d files", len(files))
 
         win = Gtk.Window(title=translation.gettext("dialog_move_into_folder_title"))
         win.set_default_size(350, 120)
