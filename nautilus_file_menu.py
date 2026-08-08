@@ -10,8 +10,9 @@ from modules.copy_ops import CopyOps
 from modules.file_utils import uri_to_path as _uri_to_path
 from modules.folder_ops import FolderOps
 from modules.ide_ops import IdeOps, is_file_openable_in_ide
+from modules.terminal_ops import TerminalOps
 from modules.notify import set_log_level
-from translation import Translation
+import translation
 
 require_version('Gtk', '4.0')
 from gi.repository import Nautilus, GObject, Gtk, Gdk, GLib
@@ -83,7 +84,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 user_cfg = json.load(json_file)
                 self._deep_update(self.config, user_cfg)
                 if self.config.get("language"):
-                    Translation.select_language(self.config["language"])
+                    translation.select_language(self.config["language"])
                 if self.config.get("log_level"):
                     set_log_level(self.config["log_level"])
             except Exception:
@@ -93,6 +94,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         self.copy_ops = CopyOps(self.config, self.clipboard, self.primary_clipboard)
         self.folder_ops = FolderOps()
         self.ide_ops = IdeOps(self.config)
+        self.terminal_ops = TerminalOps(self.config)
         self.checksum_ops = ChecksumOps(self.config, self.clipboard, self.primary_clipboard)
 
         app = Gtk.Application.get_default()
@@ -138,8 +140,12 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         return self._create_menu_items(files, "File")
 
     def get_background_items(self, *args):
-        file = args[-1]
-        return self._create_menu_items([file], "Background")
+        folder = args[-1]
+        items = []
+        ops = self.config.get("ops_enabled", {})
+        items.extend(self._create_ide_items([folder], "Background", ops))
+        items.extend(self._create_terminal_items([folder], "Background", ops))
+        return items
 
     def _create_menu_items(self, files: list[Nautilus.FileInfo], group) -> list[Nautilus.MenuItem]:
         items = []
@@ -148,6 +154,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         items.extend(self._create_copy_items(files, group, ops))
         items.extend(self._create_folder_items(files, group, ops))
         items.extend(self._create_ide_items(files, group, ops))
+        items.extend(self._create_terminal_items(files, group, ops))
         items.extend(self._create_checksum_items(files, group, ops))
 
         return items
@@ -167,28 +174,16 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         entries = []
 
         if copy_items_cfg.get("copy_path", {}).get("enabled", True):
-            entries.append((
-                "CopyPath",
-                Translation.t("copy_paths" if plural else "copy_path"),
-                self.copy_ops.copy_paths,
-                files,
-            ))
+            label = translation.gettext("copy_paths") if plural else translation.gettext("copy_path")
+            entries.append(("CopyPath", label, self.copy_ops.copy_paths, files))
 
         if copy_items_cfg.get("copy_uri", {}).get("enabled", True):
-            entries.append((
-                "CopyUri",
-                Translation.t("copy_uris" if plural else "copy_uri"),
-                self.copy_ops.copy_uris,
-                files,
-            ))
+            label = translation.gettext("copy_uris") if plural else translation.gettext("copy_uri")
+            entries.append(("CopyUri", label, self.copy_ops.copy_uris, files))
 
         if copy_items_cfg.get("copy_name", {}).get("enabled", True):
-            entries.append((
-                "CopyName",
-                Translation.t("copy_names" if plural else "copy_name"),
-                self.copy_ops.copy_names,
-                files,
-            ))
+            label = translation.gettext("copy_names") if plural else translation.gettext("copy_name")
+            entries.append(("CopyName", label, self.copy_ops.copy_names, files))
 
         if copy_items_cfg.get("copy_content", {}).get("enabled", True):
             allow_copy_content = ["application/x-shellscript", "application/json"]
@@ -196,7 +191,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                     files[0].get_mime_type() in allow_copy_content or files[0].get_mime_type().startswith("text/")):
                 entries.append((
                     "CopyContent",
-                    Translation.t("copy_content"),
+                    translation.gettext("copy_content"),
                     self.copy_ops.copy_content,
                     files[0],
                 ))
@@ -227,7 +222,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
             menu_item = Nautilus.MenuItem(
                 name="NautilusFileMenu::CopyMore" + group,
-                label=Translation.t("copy_more"),
+                label=translation.gettext("copy_more"),
             )
             menu_item.set_submenu(submenu)
             return [menu_item]
@@ -256,7 +251,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         ):
             item = Nautilus.MenuItem(
                 name="NautilusFileMenu::DissolveFolder" + group,
-                label=Translation.t("dissolve_folder"),
+                label=translation.gettext("dissolve_folder"),
             )
             item.connect("activate", self.folder_ops.dissolve_folder, files)
             items.append(item)
@@ -264,7 +259,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         if ops.get("move_into_folder", True) and len(files) >= 2:
             item = Nautilus.MenuItem(
                 name="NautilusFileMenu::MoveIntoFolder" + group,
-                label=Translation.t("move_into_folder"),
+                label=translation.gettext("move_into_folder"),
             )
             item.connect("activate", self.folder_ops.move_into_folder, files)
             items.append(item)
@@ -319,7 +314,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 submenu.append_item(jb_item)
             else:
                 jb_cfg = self.config.get("open_ide", {}).get("jetbrains_ides", {})
-                if jb_cfg.get("collapse_menu", True):
+                if jb_cfg.get("collapse_menu", False):
                     # Multiple + collapse: fold into "JetBrains" submenu
                     jb_submenu = Nautilus.Menu()
                     for jb_label, jb_cmd in jb_ides:
@@ -336,7 +331,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
                     jb_menu_item = Nautilus.MenuItem(
                         name="NautilusFileMenu::OpenIDE_JetBrains" + group,
-                        label=Translation.t("open_with_jetbrains"),
+                        label=translation.gettext("open_with_jetbrains"),
                     )
                     jb_menu_item.set_submenu(jb_submenu)
                     submenu.append_item(jb_menu_item)
@@ -356,10 +351,74 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
         menu_item = Nautilus.MenuItem(
             name="NautilusFileMenu::OpenIDE" + group,
-            label=Translation.t("open_with_ide_submenu"),
+            label=translation.gettext("open_with_ide_submenu"),
         )
         menu_item.set_submenu(submenu)
         items.append(menu_item)
+
+        return items
+
+    # --- Terminal operations ---
+
+    def _create_terminal_items(self, files: list[Nautilus.FileInfo], group,
+                               ops: dict[str, bool]) -> list[Nautilus.MenuItem]:
+        items = []
+        if not ops.get("open_terminal", True):
+            return items
+
+        # Only show for single directory
+        if len(files) != 1 or not files[0].is_directory():
+            return items
+
+        terminals = self.terminal_ops.get_terminals()
+        if not terminals:
+            return items
+
+        terminal_cfg = self.config.get("open_terminal", {})
+        if len(terminals) == 1:
+            name, cfg = terminals[0]
+            item = Nautilus.MenuItem(
+                name="NautilusFileMenu::OpenTerminal" + group,
+                label=translation.gettext("open_in_terminal") % {"name": name},
+            )
+            item.connect(
+                "activate",
+                lambda m, f, c=cfg: self.terminal_ops.open_terminal(m, f, c),
+                files,
+            )
+            items.append(item)
+        elif terminal_cfg.get("collapse_menu", True):
+            submenu = Nautilus.Menu()
+            for name, cfg in terminals:
+                sub_item = Nautilus.MenuItem(
+                    name="NautilusFileMenu::OpenTerminal_" + name + group,
+                    label=translation.gettext("open_in_terminal") % {"name": name},
+                )
+                sub_item.connect(
+                    "activate",
+                    lambda m, f, c=cfg: self.terminal_ops.open_terminal(m, f, c),
+                    files,
+                )
+                submenu.append_item(sub_item)
+
+            menu_item = Nautilus.MenuItem(
+                name="NautilusFileMenu::OpenTerminal" + group,
+                label=translation.gettext("open_in_terminal_submenu"),
+            )
+            menu_item.set_submenu(submenu)
+            items.append(menu_item)
+        else:
+            for name, cfg in terminals:
+                item = Nautilus.MenuItem(
+                    name="NautilusFileMenu::OpenTerminal_" + name + group,
+                    label=translation.gettext("open_in_terminal") % {"name": name},
+                )
+                item.connect(
+                    "activate",
+                    lambda m, f, c=cfg: self.terminal_ops.open_terminal(m, f, c),
+                    files,
+                )
+                items.append(item)
 
         return items
 
@@ -384,7 +443,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             algo = algos[0]
             item = Nautilus.MenuItem(
                 name="NautilusFileMenu::Checksum_" + algo + group,
-                label=Translation.t("checksum").format(algo=algo.upper()),
+                label=translation.gettext("checksum") % {"algo": algo.upper()},
             )
             item.connect(
                 "activate",
@@ -408,7 +467,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
             menu_item = Nautilus.MenuItem(
                 name="NautilusFileMenu::Checksum" + group,
-                label=Translation.t("checksum_submenu"),
+                label=translation.gettext("checksum_submenu"),
             )
             menu_item.set_submenu(submenu)
             items.append(menu_item)
