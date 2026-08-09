@@ -28,24 +28,17 @@ _DEFAULT_EXCLUDE_MIME = [
     "application/x-xz", "application/pdf", "application/epub+zip",
     "application/x-rpm", "application/x-alpm-package",
     "application/x-executable", "application/x-sharedlib", "application/x-mach-binary",
-    "application/x-iso9660-image", "application/octet-stream"
+    "application/x-iso9660-image", "application/octet-stream",
     "application/msword",
 ]
 
-_exclude_mime_cache = None
-
-
 def _get_exclude_mime(config):
-    """Get merged exclude_mime list (built-in + config), with caching."""
-    global _exclude_mime_cache
-    if _exclude_mime_cache is not None:
-        return _exclude_mime_cache
+    """Get merged exclude_mime list (built-in + config)."""
     user_exclude = config.get("open_ide", {}).get("exclude_mime", [])
-    _exclude_mime_cache = _DEFAULT_EXCLUDE_MIME + user_exclude
-    return _exclude_mime_cache
+    return _DEFAULT_EXCLUDE_MIME + user_exclude
 
 
-def is_file_openable_in_ide(file, config=None):
+def is_openable_in_editor(file, config=None):
     """Check if a file can be opened in an IDE based on MIME type exclusion."""
     mime = file.get_mime_type()
     # logger.debug("File mime type: %s", mime)
@@ -189,7 +182,8 @@ class IdeOps:
                     )
             except Exception as e:
                 logger.exception("Failed to open IDE: %s, cause: %s", name, e)
-        logger.warn("Empty cmd list or paths")
+        else:
+            logger.warning("Empty cmd list or paths")
 
     def get_other_ides(self):
         """Return list of (display_name, display_name) for non-JetBrains IDEs."""

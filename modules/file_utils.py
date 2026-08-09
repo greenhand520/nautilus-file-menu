@@ -17,7 +17,11 @@ from .notify import logger
 def uri_to_path(file):
     """Convert a Nautilus FileInfo URI to an absolute filesystem path."""
     p = urlparse(file.get_activation_uri())
-    return os.path.abspath(os.path.join(p.netloc, unquote(p.path)))
+    if p.scheme == "file" and p.netloc in ("", "localhost"):
+        return os.path.abspath(unquote(p.path))
+    # Non-file URIs (e.g. sftp://host/path): prefix the host so the result stays
+    # deterministic and never aliases a random local path.
+    return os.path.abspath(os.path.join(p.netloc, unquote(p.path).lstrip("/")))
 
 
 # MIME types allowed for "copy content" (in addition to text/*)

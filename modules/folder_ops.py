@@ -23,6 +23,15 @@ def _unique_dst(parent, item_name):
     return dst
 
 
+def _is_valid_folder_name(name):
+    """Reject names that would escape the parent directory or nest unexpectedly."""
+    if not name or name in (".", ".."):
+        return False
+    if "/" in name or "\\" in name:
+        return False
+    return True
+
+
 class FolderOps:
     def dissolve_folder(self, menu, files):
         """Move all contents of selected folders to their parents, then delete the folders."""
@@ -98,8 +107,14 @@ class FolderOps:
             logger.debug("dissolving: %s", folder_path)
             parent_path = os.path.dirname(folder_path)
 
+            try:
+                items = os.listdir(folder_path)
+            except OSError as e:
+                logger.error("dissolve_folder: cannot read %s: %s", folder_path, e)
+                continue
+
             move_failed = False
-            for item_name in os.listdir(folder_path):
+            for item_name in items:
                 src = os.path.join(folder_path, item_name)
                 dst = _unique_dst(parent_path, item_name)
                 if not file_move(src, dst):
@@ -170,7 +185,8 @@ class FolderOps:
 
     def _do_move_into_folder(self, win, folder_name, files):
         folder_name = folder_name.strip()
-        if not folder_name:
+        if not _is_valid_folder_name(folder_name):
+            logger.warning("move_into_folder: invalid folder name: %r", folder_name)
             return
 
         win.destroy()
@@ -179,8 +195,11 @@ class FolderOps:
         parent_path = os.path.dirname(paths[0])
         new_folder = os.path.join(str(parent_path), folder_name)
 
-        gio_make_directories(new_folder)
+        if not gio_make_directories(new_folder):
+            logger.error("move_into_folder: failed to create %s", new_folder)
+            return
 
         for src in paths:
             dst = _unique_dst(new_folder, os.path.basename(src))
-            file_move(src, dst)
+            if not file_move(src, dst):
+                logger.error("move_into_folder: failed to move %s -> %s", src, dst)

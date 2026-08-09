@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-file-menu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-09 00:38+0800\n"
+"POT-Creation-Date: 2026-08-09 15:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,85 +41,98 @@ msgstr ""
 msgid "copy_name"
 msgstr ""
 
-#: nautilus_file_menu.py:213
+#: nautilus_file_menu.py:216
 msgid "copy_content"
 msgstr ""
 
-#: nautilus_file_menu.py:244
+#: nautilus_file_menu.py:247
 msgid "copy_more"
 msgstr ""
 
-#: nautilus_file_menu.py:275 modules/folder_ops.py:48
+#: nautilus_file_menu.py:278 modules/folder_ops.py:57
 msgid "dissolve_folder"
 msgstr ""
 
-#: nautilus_file_menu.py:283
+#: nautilus_file_menu.py:286
 msgid "move_into_folder"
 msgstr ""
 
-#: nautilus_file_menu.py:315
+#: nautilus_file_menu.py:318
 msgid "open_with_ide"
 msgstr ""
 
-#: nautilus_file_menu.py:371
+#: nautilus_file_menu.py:374
 msgid "open_with_jetbrains"
 msgstr ""
 
-#: nautilus_file_menu.py:391
+#: nautilus_file_menu.py:394
 msgid "open_with_ide_submenu"
 msgstr ""
 
-#: nautilus_file_menu.py:419 nautilus_file_menu.py:432
-#: nautilus_file_menu.py:451
+#: nautilus_file_menu.py:422 nautilus_file_menu.py:435
+#: nautilus_file_menu.py:454
 msgid "open_in_terminal"
 msgstr ""
 
-#: nautilus_file_menu.py:443
+#: nautilus_file_menu.py:446
 msgid "open_in_terminal_submenu"
 msgstr ""
 
-#: nautilus_file_menu.py:476
+#: nautilus_file_menu.py:479
 msgid "extract_appimage"
 msgstr ""
 
-#: nautilus_file_menu.py:498
+#: nautilus_file_menu.py:501
 msgid "launch_desktop"
 msgstr ""
 
-#: nautilus_file_menu.py:532
+#: nautilus_file_menu.py:535
 msgid "open_as_admin"
 msgstr ""
 
-#: nautilus_file_menu.py:541
+#: nautilus_file_menu.py:544
 msgid "edit_as_admin"
 msgstr ""
 
-#: nautilus_file_menu.py:569
+#: nautilus_file_menu.py:572
 msgid "checksum"
 msgstr ""
 
-#: nautilus_file_menu.py:593
+#: nautilus_file_menu.py:596
 msgid "checksum_submenu"
 msgstr ""
 
-#: modules/admin_ops.py:59
+#: modules/admin_ops.py:51 modules/admin_ops.py:59
 msgid "notify_admin_done"
 msgstr ""
 
-#: modules/admin_ops.py:60
+#: modules/admin_ops.py:52 modules/admin_ops.py:60
 msgid "notify_no_editor"
 msgstr ""
 
-#: modules/appimage_ops.py:70 modules/appimage_ops.py:75
+#: modules/appimage_ops.py:71
+msgid "appimage_extracting"
+msgstr ""
+
+#: modules/appimage_ops.py:82 modules/appimage_ops.py:87
 msgid "notify_appimage_extract_done"
 msgstr ""
 
-#: modules/appimage_ops.py:71
+#: modules/appimage_ops.py:83
 msgid "notify_appimage_extract_count"
 msgstr ""
 
-#: modules/appimage_ops.py:76
+#: modules/appimage_ops.py:88
 msgid "notify_appimage_extract_failed"
+msgstr ""
+
+#: modules/appimage_ops.py:92
+msgid "appimage_extracting_title"
+msgstr ""
+
+#: modules/appimage_ops.py:115 modules/folder_ops.py:74
+#: modules/folder_ops.py:158
+msgid "dialog_cancel"
 msgstr ""
 
 #: modules/checksum_ops.py:95
@@ -130,50 +143,46 @@ msgstr ""
 msgid "notify_files_checksum_ok"
 msgstr ""
 
-#: modules/copy_ops.py:51
+#: modules/copy_ops.py:55
 msgid "notify_file_contents_copied"
 msgstr ""
 
-#: modules/folder_ops.py:42
+#: modules/folder_ops.py:51
 msgid "dialog_dissolve_confirm"
 msgstr ""
 
-#: modules/folder_ops.py:45
+#: modules/folder_ops.py:54
 msgid "dialog_dissolve_confirm_plural"
 msgstr ""
 
-#: modules/folder_ops.py:65 modules/folder_ops.py:143
-msgid "dialog_cancel"
-msgstr ""
-
-#: modules/folder_ops.py:69
+#: modules/folder_ops.py:78
 msgid "dialog_dissolve"
 msgstr ""
 
-#: modules/folder_ops.py:123
+#: modules/folder_ops.py:138
 msgid "dialog_move_into_folder_title"
 msgstr ""
 
-#: modules/folder_ops.py:133
+#: modules/folder_ops.py:148
 msgid "dialog_folder_name_label"
 msgstr ""
 
-#: modules/folder_ops.py:137
+#: modules/folder_ops.py:152
 msgid "dialog_default_folder_name"
 msgstr ""
 
-#: modules/folder_ops.py:147
+#: modules/folder_ops.py:162
 msgid "dialog_create"
 msgstr ""
 
-#: modules/launch_ops.py:106 modules/launch_ops.py:123
+#: modules/launch_ops.py:118 modules/launch_ops.py:135
 msgid "notify_launch_done"
 msgstr ""
 
-#: modules/launch_ops.py:107
+#: modules/launch_ops.py:119
 msgid "notify_no_terminal"
 msgstr ""
 
-#: modules/launch_ops.py:124
+#: modules/launch_ops.py:136
 msgid "notify_launch_count"
 msgstr ""

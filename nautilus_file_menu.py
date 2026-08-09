@@ -1,19 +1,18 @@
 import json
 import os
-import traceback
 from typing import Any
 
 from gi import require_version
 
 from modules.checksum_ops import ChecksumOps
-from modules.copy_ops import CopyOps
+from modules.copy_ops import CopyOps, MAX_FILE_CONTENT_COPY
 from modules.file_utils import uri_to_path as _uri_to_path, COPY_CONTENT_MIME_TYPES
 from modules.folder_ops import FolderOps
-from modules.ide_ops import IdeOps, is_file_openable_in_ide
+from modules.ide_ops import IdeOps, is_openable_in_editor
 from modules.terminal_ops import TerminalOps
 from modules.appimage_ops import AppImageOps, is_appimage
 from modules.launch_ops import LaunchOps
-from modules.admin_ops import AdminOps, _is_openable_in_editor
+from modules.admin_ops import AdminOps
 from modules.notify import set_log_level, logger
 import translation
 
@@ -85,8 +84,8 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             },
         }
 
-        with open(os.path.join(os.path.dirname(__file__), "config.json")) as json_file:
-            try:
+        try:
+            with open(os.path.join(os.path.dirname(__file__), "config.json")) as json_file:
                 user_cfg = json.load(json_file)
                 self._deep_update(self.config, user_cfg)
                 lang = self.config.get("language", "auto")
@@ -94,9 +93,8 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 translation.select_language(lang)
                 set_log_level(log_level)
                 logger.info("Config loaded: language=%s, log_level=%s", lang, log_level)
-            except Exception:
-                logger.exception("Failed to load config")
-                traceback.print_exc()
+        except Exception as e:
+            logger.exception("Failed to load config, cause: %s", e)
 
         # Initialize operation modules
         self.copy_ops = CopyOps(self.config, self.clipboard, self.primary_clipboard)
@@ -147,7 +145,9 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         window = app.get_active_window()
         files = args[-1]
 
-        self.selected_files[window.get_id()] = files
+        # Window can be None in edge cases; shortcuts simply won't be armed.
+        if window is not None:
+            self.selected_files[window.get_id()] = files
         # logger.debug("get_file_items: %d file(s) selected", len(files))
 
         return self._create_menu_items(files, "File")
@@ -206,8 +206,11 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             entries.append(("CopyName", label, self.copy_ops.copy_names, files))
 
         if copy_items_cfg.get("copy_content", {}).get("enabled", True):
-            if len(files) == 1 and (
-                    files[0].get_mime_type() in COPY_CONTENT_MIME_TYPES or files[0].get_mime_type().startswith("text/")):
+            # Nautilus 50 removed FileInfo.get_size(); use the local path.
+            if (len(files) == 1
+                    and (files[0].get_mime_type() in COPY_CONTENT_MIME_TYPES
+                         or files[0].get_mime_type().startswith("text/"))
+                    and os.path.getsize(_uri_to_path(files[0])) <= MAX_FILE_CONTENT_COPY):
                 entries.append((
                     "CopyContent",
                     translation.gettext("copy_content"),
@@ -297,7 +300,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             return items
         if len(files) != 1:
             return items
-        if not is_file_openable_in_ide(files[0], self.config):
+        if not is_openable_in_editor(files[0], self.config):
             return items
 
         other_ides = self.ide_ops.get_other_ides()
@@ -535,7 +538,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             items.append(item)
 
         # "Edit as Administrator" for editable files (MIME check)
-        if not is_dir and _is_openable_in_editor(f, self.config):
+        if not is_dir and is_openable_in_editor(f, self.config):
             item = Nautilus.MenuItem(
                 name="NautilusFileMenu::EditAsAdmin" + group,
                 label=translation.gettext("edit_as_admin"),

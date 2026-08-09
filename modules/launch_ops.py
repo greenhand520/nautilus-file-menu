@@ -29,15 +29,27 @@ class LaunchOps:
         self.terminal_ops = terminal_ops
 
     def _find_terminal(self):
-        """Find a terminal emulator: first from terminal_ops, then fallback list."""
+        """Return a terminal prefix that runs a command, e.g. ['ptyxis', '-e'].
+
+        The returned list is prepended to the command to launch. The full
+        terminal command from the config is preserved (flags included);
+        ``{path}`` is replaced with the home directory because the launched
+        program chooses its own working directory.
+        """
         # 1. Use the first detected terminal from terminal_ops
         if self.terminal_ops:
             terminals = self.terminal_ops.get_terminals()
             if terminals:
-                name, cfg = terminals[0]
+                _name, cfg = terminals[0]
+                home = os.path.expanduser("~")
+                if cfg.get("_flatpak"):
+                    flatpak = cfg.get("flatpak", [])
+                    if flatpak:
+                        args = ["flatpak", "run"] + [a.replace("{path}", home) for a in flatpak]
+                        return args + ["-e"]
                 cmd = cfg.get("cmd", [])
                 if cmd:
-                    return [cmd[0], "-e"]
+                    return [a.replace("{path}", home) for a in cmd] + ["-e"]
 
         # 2. Fallback: try common terminal binaries
         for term in _FALLBACK_TERMINALS:

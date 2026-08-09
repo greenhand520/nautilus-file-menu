@@ -1,9 +1,10 @@
 import os
 import shlex
-from urllib.parse import urlparse, unquote
-from .file_utils import COPY_CONTENT_MIME_TYPES
+from .file_utils import uri_to_path as _uri_to_path, COPY_CONTENT_MIME_TYPES
 from .notify import notify, logger
 import translation
+
+MAX_FILE_CONTENT_COPY = 512 * 1024
 
 
 class CopyOps:
@@ -13,10 +14,6 @@ class CopyOps:
         self.primary_clipboard = primary_clipboard
 
     def copy_paths(self, menu, files):
-        def _uri_to_path(file):
-            p = urlparse(file.get_activation_uri())
-            return os.path.abspath(os.path.join(p.netloc, unquote(p.path)))
-
         self._copy_value(list(map(_uri_to_path, files)))
 
     def copy_uris(self, menu, files):
@@ -35,11 +32,18 @@ class CopyOps:
         self._copy_value(list(map(_name, files)))
 
     def copy_content(self, menu, file):
+        # Nautilus 50 removed FileInfo.get_size(); use the local path.
+        p = _uri_to_path(file)
+        try:
+            if os.path.getsize(p) > MAX_FILE_CONTENT_COPY:
+                return
+        except OSError as e:
+            logger.error("copy_content: cannot stat %s: %s", p, e)
+            return
         content = []
         file_type = file.get_mime_type()
         if file_type in COPY_CONTENT_MIME_TYPES or file_type.startswith("text/"):
-            p = urlparse(file.get_activation_uri())
-            p = os.path.abspath(os.path.join(p.netloc, unquote(p.path)))
+            p = _uri_to_path(file)
             logger.debug("copy_content: reading %s", p)
             try:
                 with open(p, 'r') as _file:
@@ -62,7 +66,7 @@ class CopyOps:
             if copy_cfg.get("escape_value", False):
                 new_value = shlex.quote(new_value)
 
-            selections = self.config.get("selections", {"clipboard": True, "primary": True})
+            selections = copy_cfg.get("selections", {"clipboard": True, "primary": True})
             if selections.get("clipboard", True):
                 self.clipboard.set(new_value)
 

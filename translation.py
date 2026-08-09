@@ -19,18 +19,21 @@ def _setup(lang_code="auto"):
     """Initialize gettext and return the translation function."""
     if lang_code and lang_code != "auto":
         languages = [lang_code]
+        resolved = lang_code
     else:
         try:
             sys_locale = locale.getlocale()[0] or os.environ.get("LANG", "en")
             languages = [sys_locale]
+            resolved = sys_locale
         except (AttributeError, ValueError):
             languages = ["en"]
+            resolved = "en"
 
     t = _gettext.translation(DOMAIN, _LOCALE_DIR, languages=languages, fallback=True)
     if type(t) is _gettext.NullTranslations:
-        _logger.warning("No translation found for language '%s', using fallback", lang_code)
+        _logger.warning("No translation found for language '%s', using fallback", resolved)
     else:
-        _logger.debug("Translation loaded: language=%s, locale_dir=%s", lang_code, _LOCALE_DIR)
+        _logger.debug("Translation loaded: language=%s, locale_dir=%s", resolved, _LOCALE_DIR)
     return t.gettext
 
 
