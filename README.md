@@ -1,8 +1,9 @@
 # Nautilus File Menu
 
-A feature-rich right-click context menu extension for Nautilus (GNOME Files).
+A project that integrates my commonly used Nautilus (GNOME Files) right-click menu. 
+Some functions refer to the original design and some modifications are made to meet my usage needs and habits.
 
-**Note⚠️: Only tested on Gnome 50** In theory, all Gnome desktops using GTK4 support.
+**Note⚠️: Only tested on CachyOS with nautilus 50.2.** In theory, all nautilus using GTK4 support.
 
 ## Features
 
