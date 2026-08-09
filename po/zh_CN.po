@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-file-menu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-09 15:38+0800\n"
+"POT-Creation-Date: 2026-08-09 16:47+0800\n"
 "PO-Revision-Date: 2026-08-08\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Simplified)\n"
@@ -108,27 +108,27 @@ msgstr "管理员操作"
 msgid "notify_no_editor"
 msgstr "未找到文本编辑器"
 
-#: modules/appimage_ops.py:71
+#: modules/appimage_ops.py:73
 msgid "appimage_extracting"
 msgstr "正在解压：{name}（{current}/{total}）"
 
-#: modules/appimage_ops.py:82 modules/appimage_ops.py:87
+#: modules/appimage_ops.py:84 modules/appimage_ops.py:89
 msgid "notify_appimage_extract_done"
 msgstr "AppImage 解压完成"
 
-#: modules/appimage_ops.py:83
+#: modules/appimage_ops.py:85
 msgid "notify_appimage_extract_count"
 msgstr "成功解压 %(count)s 个文件"
 
-#: modules/appimage_ops.py:88
+#: modules/appimage_ops.py:90
 msgid "notify_appimage_extract_failed"
 msgstr "没有文件被解压"
 
-#: modules/appimage_ops.py:92
+#: modules/appimage_ops.py:94
 msgid "appimage_extracting_title"
 msgstr "正在解压 AppImage"
 
-#: modules/appimage_ops.py:115 modules/folder_ops.py:74
+#: modules/appimage_ops.py:117 modules/folder_ops.py:74
 #: modules/folder_ops.py:158
 msgid "dialog_cancel"
 msgstr "取消"
