@@ -22,8 +22,8 @@ class ChecksumOps:
         self.config = config
         self.clipboard = clipboard
         self.primary_clipboard = primary_clipboard
-        algo_cfg = config.get("checksum_algorithms", {})
-        self.algorithms = algo_cfg.get("enabled", ["md5", "sha1", "sha256", "sha512"])
+        algo_cfg = config.get("checksum", {})
+        self.algorithms = algo_cfg.get("enabled_algorithms", ["md5", "sha1", "sha256", "sha512"])
 
     def compute_checksum(self, menu, files, algo_name):
         """Compute checksum for selected files and copy to clipboard."""

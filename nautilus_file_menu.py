@@ -79,8 +79,8 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 "terminals": {},
                 "collapse_menu": True,
             },
-            "checksum_algorithms": {
-                "enabled": ["md5", "sha1", "sha256", "sha512"],
+            "checksum": {
+                "enabled_algorithms": ["md5", "sha1", "sha256", "sha512"],
             },
         }
 

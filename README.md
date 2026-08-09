@@ -218,11 +218,11 @@ Toggle which features appear in the context menu:
 
 > **Tip**: To add a new terminal, add an entry to `terminals` with the command in `cmd` (use `{path}` for the working directory) and optionally a Flatpak app ID in `flatpak`.
 
-### checksum_algorithms — Checksum Configuration
+### checksum — Checksum Configuration
 
 ```json
-"checksum_algorithms": {
-  "enabled": ["md5", "sha1", "sha256", "sha512"]
+"checksum": {
+  "enabled_algorithms": ["md5", "sha1", "sha256", "sha512"]
 }
 ```
 
