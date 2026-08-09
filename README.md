@@ -65,13 +65,13 @@ sudo pacman -S python-nautilus python-gobject
 sudo apt install python3-nautilus python3-gi
 
 # Fedora
-sudo dnf install nautilus-python python3-gobject
+sudo dnf install nautilus-python python3-gobject nautilus-devel
 ```
 
 ### Install
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/greenhand520/nautilus-file-menu.git
 cd nautilus-file-menu
 make install
 nautilus -q  # Restart Nautilus
