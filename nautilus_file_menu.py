@@ -470,7 +470,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
             return []
 
         # Only show if at least one selected file is an AppImage
-        has_appimage = any(is_appimage(_uri_to_path(f)) for f in files)
+        has_appimage = any(is_appimage(f) for f in files)
         if not has_appimage:
             return []
 

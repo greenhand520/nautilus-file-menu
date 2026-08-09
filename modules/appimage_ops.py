@@ -17,9 +17,11 @@ import translation
 EXTRACT_TIMEOUT = 60
 
 
-def is_appimage(path):
-    """Check if a file is an AppImage (by extension only)."""
-    return path.endswith(".AppImage") and os.path.isfile(path)
+def is_appimage(file):
+    """Check if a file is an AppImage"""
+    return file.get_mime_type() == "application/vnd.appimage"
+    # path = _uri_to_path(file)
+    # return path.endswith(".AppImage") and os.path.isfile(path)
 
 
 def _unique_extract_dir(parent, base_name):
