@@ -34,6 +34,10 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 window.add_shortcut(shortcut)
 
     def _window_removed(self, application, window):
+        # Nautilus 50 may emit a NautilusFileChooser widget (no get_id) here
+        # instead of a Gtk.ApplicationWindow; only clean up real windows.
+        if not hasattr(window, "get_id"):
+            return
         window_id = window.get_id()
         if window_id in self.selected_files:
             del self.selected_files[window_id]
@@ -122,6 +126,11 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
 
     def _shortcuts_handler(self, window, key) -> bool:
         item_name = GLib.Variant.get_string(key)
+        # Guard the same Nautilus 50 case as _window_removed: the shortcut may be
+        # attached to a widget without get_id, in which case there is no
+        # selection to act on.
+        if not hasattr(window, "get_id"):
+            return False
         window_id = window.get_id()
         logger.debug("Shortcut triggered: item=%s, window=%s", item_name, window_id)
 
@@ -557,12 +566,12 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         if not ops.get("checksum", True):
             return items
 
-        checksum_files = [f for f in files if not os.path.isdir(_uri_to_path(f))]
-        if not checksum_files:
-            return items
-
         algos = self.checksum_ops.get_available_algorithms()
         if not algos:
+            return items
+
+        checksum_files = [f for f in files if not os.path.isdir(_uri_to_path(f))]
+        if not checksum_files:
             return items
 
         if len(algos) == 1:

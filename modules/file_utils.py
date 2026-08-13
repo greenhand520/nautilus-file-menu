@@ -16,11 +16,14 @@ from .notify import logger
 
 def uri_to_path(file):
     """Convert a Nautilus FileInfo URI to an absolute filesystem path."""
+    # logger.debug("file url: %s", file.get_activation_uri())
     p = urlparse(file.get_activation_uri())
-    if p.scheme == "file" and p.netloc in ("", "localhost"):
+    if p.netloc in ("", "localhost"):
+        # file:///path and admin:///path both map directly to a local absolute
+        # path; host-less URIs never need a host prefix.
         return os.path.abspath(unquote(p.path))
-    # Non-file URIs (e.g. sftp://host/path): prefix the host so the result stays
-    # deterministic and never aliases a random local path.
+    # Remote URIs with a host (e.g. sftp://host/path): prefix the host so the
+    # result stays deterministic and never aliases a random local path.
     return os.path.abspath(os.path.join(p.netloc, unquote(p.path).lstrip("/")))
 
 

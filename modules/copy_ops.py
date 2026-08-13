@@ -1,5 +1,7 @@
 import os
 import shlex
+from urllib.parse import unquote
+
 from .file_utils import uri_to_path as _uri_to_path, COPY_CONTENT_MIME_TYPES
 from .notify import notify, logger
 import translation

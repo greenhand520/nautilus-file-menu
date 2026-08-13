@@ -25,6 +25,17 @@ class UriToPathTests(unittest.TestCase):
             "/home/user/my file.txt",
         )
 
+    def test_admin_uri_maps_to_local_path(self):
+        # Regression: admin:/// URIs (used by "open as administrator") used to
+        # resolve against the CWD instead of the real filesystem root.
+        self.assertEqual(
+            uri_to_path(_FakeFile("admin:///usr/bin/gcc")),
+            "/usr/bin/gcc",
+        )
+
+    def test_admin_localhost_uri_maps_to_local_path(self):
+        self.assertEqual(uri_to_path(_FakeFile("admin://localhost/etc/fstab")), "/etc/fstab")
+
     def test_non_file_uri_keeps_host_as_prefix(self):
         expected = os.path.abspath(os.path.join("host", "tmp", "a.txt"))
         self.assertEqual(uri_to_path(_FakeFile("sftp://host/tmp/a.txt")), expected)
