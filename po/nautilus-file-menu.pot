@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-file-menu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-13 17:09+0800\n"
+"POT-Creation-Date: 2026-08-16 21:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,97 +17,105 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: nautilus_file_menu.py:206
+#: nautilus_file_menu.py:207
 msgid "copy_paths"
 msgstr ""
 
-#: nautilus_file_menu.py:206
+#: nautilus_file_menu.py:207
 msgid "copy_path"
 msgstr ""
 
-#: nautilus_file_menu.py:210
+#: nautilus_file_menu.py:211
 msgid "copy_uris"
 msgstr ""
 
-#: nautilus_file_menu.py:210
+#: nautilus_file_menu.py:211
 msgid "copy_uri"
 msgstr ""
 
-#: nautilus_file_menu.py:214
+#: nautilus_file_menu.py:215
 msgid "copy_names"
 msgstr ""
 
-#: nautilus_file_menu.py:214
+#: nautilus_file_menu.py:215
 msgid "copy_name"
 msgstr ""
 
-#: nautilus_file_menu.py:225
+#: nautilus_file_menu.py:226
 msgid "copy_content"
 msgstr ""
 
-#: nautilus_file_menu.py:256
+#: nautilus_file_menu.py:257
 msgid "copy_more"
 msgstr ""
 
-#: nautilus_file_menu.py:287 modules/folder_ops.py:57
+#: nautilus_file_menu.py:288 modules/folder_ops.py:57
 msgid "dissolve_folder"
 msgstr ""
 
-#: nautilus_file_menu.py:295
+#: nautilus_file_menu.py:296
 msgid "move_into_folder"
 msgstr ""
 
-#: nautilus_file_menu.py:327
+#: nautilus_file_menu.py:328
 msgid "open_with_ide"
 msgstr ""
 
-#: nautilus_file_menu.py:383
+#: nautilus_file_menu.py:384
 msgid "open_with_jetbrains"
 msgstr ""
 
-#: nautilus_file_menu.py:403
+#: nautilus_file_menu.py:404
 msgid "open_with_ide_submenu"
 msgstr ""
 
-#: nautilus_file_menu.py:431 nautilus_file_menu.py:444
-#: nautilus_file_menu.py:463
+#: nautilus_file_menu.py:432 nautilus_file_menu.py:445
+#: nautilus_file_menu.py:464
 msgid "open_in_terminal"
 msgstr ""
 
-#: nautilus_file_menu.py:455
+#: nautilus_file_menu.py:456
 msgid "open_in_terminal_submenu"
 msgstr ""
 
-#: nautilus_file_menu.py:488
+#: nautilus_file_menu.py:489
 msgid "extract_appimage"
 msgstr ""
 
-#: nautilus_file_menu.py:510
+#: nautilus_file_menu.py:511
 msgid "launch_desktop"
 msgstr ""
 
-#: nautilus_file_menu.py:544
+#: nautilus_file_menu.py:545
 msgid "open_as_admin"
 msgstr ""
 
-#: nautilus_file_menu.py:553
+#: nautilus_file_menu.py:554
 msgid "edit_as_admin"
 msgstr ""
 
-#: nautilus_file_menu.py:581
+#: nautilus_file_menu.py:563
+msgid "run_as_admin"
+msgstr ""
+
+#: nautilus_file_menu.py:591
 msgid "checksum"
 msgstr ""
 
-#: nautilus_file_menu.py:605
+#: nautilus_file_menu.py:615
 msgid "checksum_submenu"
 msgstr ""
 
-#: modules/admin_ops.py:51 modules/admin_ops.py:59
+#: modules/admin_ops.py:74 modules/admin_ops.py:82 modules/admin_ops.py:137
 msgid "notify_admin_done"
 msgstr ""
 
-#: modules/admin_ops.py:52 modules/admin_ops.py:60
+#: modules/admin_ops.py:75 modules/admin_ops.py:83
 msgid "notify_no_editor"
+msgstr ""
+
+#: modules/admin_ops.py:138 modules/launch_ops.py:82
+msgid "notify_no_terminal"
 msgstr ""
 
 #: modules/appimage_ops.py:73
@@ -175,14 +183,10 @@ msgstr ""
 msgid "dialog_create"
 msgstr ""
 
-#: modules/launch_ops.py:118 modules/launch_ops.py:135
+#: modules/launch_ops.py:81 modules/launch_ops.py:98
 msgid "notify_launch_done"
 msgstr ""
 
-#: modules/launch_ops.py:119
-msgid "notify_no_terminal"
-msgstr ""
-
-#: modules/launch_ops.py:136
+#: modules/launch_ops.py:99
 msgid "notify_launch_count"
 msgstr ""

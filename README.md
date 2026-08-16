@@ -47,8 +47,13 @@ Some functions refer to the original design and some modifications are made to m
 ### Admin Operations
 - **Open as Administrator** — Open folder in Nautilus with admin privileges (uses `admin://` URI)
 - **Edit as Administrator** — Open file in default text editor with admin privileges
+- **Run as Administrator** — Run script or executable with admin privileges in a terminal via `sudo`
+  - Supports shell scripts, Python scripts, and native executables
+  - Opens a terminal, prompts for password, runs the program, and keeps the terminal open
+  - Automatically `cd`s to the executable's parent directory before running
 - Only shown for local files, single selection, non-root user
 - "Edit as Administrator" checks MIME type (excludes binary/media files, same as IDE)
+- "Run as Administrator" can be independently toggled via `admin_run` in `ops_enabled`
 
 ### Checksum
 - Supported algorithms: MD5, SHA1, SHA256, SHA512 (configurable)
@@ -124,6 +129,7 @@ Toggle which features appear in the context menu:
   "dissolve_folder": true,
   "move_into_folder": true,
   "admin": true,
+  "admin_run": true,
   "copy": true,
   "open_ide": true,
   "open_terminal": true,

@@ -58,6 +58,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 "appimage": True,
                 "launch_desktop": True,
                 "admin": True,
+                "admin_run": True,
                 "checksum": True,
             },
             "language": "auto",
@@ -108,7 +109,7 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
         self.appimage_ops = AppImageOps()
         self.launch_ops = LaunchOps(self.terminal_ops)
         self.checksum_ops = ChecksumOps(self.config, self.clipboard, self.primary_clipboard)
-        self.admin_ops = AdminOps(self.config)
+        self.admin_ops = AdminOps(self.config, self.terminal_ops)
 
         app = Gtk.Application.get_default()
         if app:
@@ -553,6 +554,15 @@ class NautilusFileMenu(GObject.Object, Nautilus.MenuProvider):
                 label=translation.gettext("edit_as_admin"),
             )
             item.connect("activate", self.admin_ops.edit_as_admin, [f])
+            items.append(item)
+
+        # "Run as Administrator" for scripts and executables
+        if ops.get("admin_run", True) and not is_dir and AdminOps.is_runnable_as_admin(f):
+            item = Nautilus.MenuItem(
+                name="NautilusFileMenu::RunAsAdmin" + group,
+                label=translation.gettext("run_as_admin"),
+            )
+            item.connect("activate", self.admin_ops.run_as_admin, [f])
             items.append(item)
 
         return items

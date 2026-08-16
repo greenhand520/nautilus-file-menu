@@ -5,6 +5,7 @@
     "dissolve_folder": true,
     "move_into_folder": true,
     "admin": true,
+    "admin_run": true,
     "copy": true,
     "open_ide": true,
     "open_terminal": true,

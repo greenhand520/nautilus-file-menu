@@ -13,6 +13,39 @@ from gi.repository import Gio
 
 from .notify import logger
 
+# Fallback terminal emulators (used when terminal_ops has none)
+FALLBACK_TERMINALS = [
+    "x-terminal-emulator", "ptyxis", "kgx", "gnome-terminal", "kitty", "alacritty",
+]
+
+
+def find_terminal(terminal_ops=None):
+    """Return a terminal prefix list (e.g. ['ptyxis', '-e']) or None.
+
+    The returned list is prepended to the command to launch.
+    ``{path}`` is replaced with the home directory.
+    """
+    if terminal_ops:
+        terminals = terminal_ops.get_terminals()
+        if terminals:
+            _name, cfg = terminals[0]
+            home = os.path.expanduser("~")
+            if cfg.get("_flatpak"):
+                flatpak = cfg.get("flatpak", [])
+                if flatpak:
+                    args = ["flatpak", "run"] + [a.replace("{path}", home) for a in flatpak]
+                    return args + ["-e"]
+            cmd = cfg.get("cmd", [])
+            if cmd:
+                return [a.replace("{path}", home) for a in cmd] + ["-e"]
+
+    for term in FALLBACK_TERMINALS:
+        found = find_binary(term)
+        if found:
+            return [found, "-e"]
+
+    return None
+
 
 def uri_to_path(file):
     """Convert a Nautilus FileInfo URI to an absolute filesystem path."""

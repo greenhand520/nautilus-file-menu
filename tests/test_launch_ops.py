@@ -3,6 +3,7 @@ import unittest
 from unittest import mock
 
 from modules.launch_ops import LaunchOps, _clean_exec
+from modules.file_utils import find_terminal
 
 
 class LaunchOpsTests(unittest.TestCase):
@@ -17,7 +18,7 @@ class LaunchOpsTests(unittest.TestCase):
         terminal_ops.get_terminals.return_value = [
             ("Ptyxis", {"cmd": ["ptyxis", "--new-window", "-d", "{path}"]})
         ]
-        prefix = LaunchOps(terminal_ops)._find_terminal()
+        prefix = find_terminal(terminal_ops)
         self.assertEqual(prefix, ["ptyxis", "--new-window", "-d", mock.ANY, "-e"])
         self.assertEqual(prefix[3], os.path.expanduser("~"))
 
@@ -26,19 +27,19 @@ class LaunchOpsTests(unittest.TestCase):
         terminal_ops.get_terminals.return_value = [
             ("Ptyxis", {"_flatpak": True, "flatpak": ["app.devsuite.Ptyxis", "--new-window", "-d", "{path}"]})
         ]
-        prefix = LaunchOps(terminal_ops)._find_terminal()
+        prefix = find_terminal(terminal_ops)
         self.assertEqual(prefix[:2], ["flatpak", "run"])
         self.assertEqual(prefix[-1], "-e")
 
     def test_find_terminal_falls_back_to_common_binary(self):
-        with mock.patch("modules.launch_ops.find_binary") as find_binary:
+        with mock.patch("modules.file_utils.find_binary") as find_binary:
             find_binary.return_value = "/usr/bin/kitty"
-            prefix = LaunchOps(None)._find_terminal()
+            prefix = find_terminal(None)
         self.assertEqual(prefix, ["/usr/bin/kitty", "-e"])
 
     def test_find_terminal_none_when_unavailable(self):
-        with mock.patch("modules.launch_ops.find_binary", return_value=None):
-            self.assertIsNone(LaunchOps(None)._find_terminal())
+        with mock.patch("modules.file_utils.find_binary", return_value=None):
+            self.assertIsNone(find_terminal(None))
 
 
 if __name__ == "__main__":
